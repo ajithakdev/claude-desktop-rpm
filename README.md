@@ -1,5 +1,7 @@
 # claude-desktop-fedora
 
+Every link and how-to is in [RESOURCES-AND-GUIDE.md](RESOURCES-AND-GUIDE.md).
+
 Run Anthropic's Claude Desktop (Linux beta) on Fedora. Anthropic only ships a `.deb` for Ubuntu and Debian. This script downloads that package from Anthropic, verifies it, and unpacks it into `~/.local`.
 
 Unofficial and not affiliated with Anthropic. The repo holds one shell script and no Anthropic files.
