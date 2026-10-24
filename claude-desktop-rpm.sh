@@ -7,6 +7,8 @@ set -euo pipefail
 REPO=https://downloads.claude.ai/claude-desktop/apt/stable
 KEY_URL=https://downloads.claude.ai/claude-desktop/key.asc
 KEY_FPR=31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE
+# Never follow a redirect off HTTPS; give up on dead or stalled downloads instead of hanging the timer.
+CURL_OPTS=(--proto-redir '=https' --connect-timeout 20 --speed-limit 1024 --speed-time 60)
 ARCH=amd64
 [ "$(uname -m)" = aarch64 ] && ARCH=arm64
 
@@ -39,35 +41,41 @@ need() {
 installed_version() { cat "$VERSION_FILE" 2>/dev/null || echo none; }
 app_running() { pgrep -f "^$APP_DIR/claude-desktop" >/dev/null; }
 
-# Writes the signed text of $1 to $2, only if the pinned key itself made the signature.
+# Writes the signed text of $1 to $2, only if the pinned key itself made a good signature.
 # A good signature alone is not enough: key.asc could carry a second key.
 verify_inrelease() {
   local status=$2.status
   gpg -q --status-fd 3 --decrypt "$1" 3>"$status" >"$2" 2>/dev/null || die "InRelease signature check failed"
-  # VALIDSIG's last field is the primary key fingerprint of the signer.
-  awk -v k="$KEY_FPR" '$2 == "VALIDSIG" && $NF == k { ok = 1 } END { exit !ok }' "$status" \
-    || die "InRelease is not signed by Anthropic's key ($KEY_FPR)"
+  # VALIDSIG: field 3 is the signing (sub)key, the last field its primary key.
+  # GOODSIG (by long key ID) is only printed when that key is not expired or revoked.
+  awk -v k="$KEY_FPR" '
+    $2 == "GOODSIG" { good[$3] = 1 }
+    $2 == "VALIDSIG" && $NF == k { pinned[substr($3, length($3) - 15)] = 1 }
+    END { for (id in pinned) if (id in good) exit 0; exit 1 }' "$status" \
+    || die "InRelease is not signed by Anthropic's key ($KEY_FPR), or that key is expired or revoked"
+  rm -f "$status"
 }
 
 # Prints "version<TAB>filename<TAB>sha256" of the newest package in the signed index.
 latest_package() {
   local work=$1
-  curl -fsSLo "$work/key.asc" "$KEY_URL"
+  curl "${CURL_OPTS[@]}" -fsSLo "$work/key.asc" "$KEY_URL"
   export GNUPGHOME="$work/gnupg"; mkdir -m 700 "$GNUPGHOME"
   gpg -q --import "$work/key.asc" 2>/dev/null
   gpg --with-colons --list-keys | grep -q "^fpr:::::::::$KEY_FPR:" || die "signing key fingerprint mismatch"
 
-  curl -fsSLo "$work/InRelease" "$REPO/dists/stable/InRelease"
+  curl "${CURL_OPTS[@]}" -fsSLo "$work/InRelease" "$REPO/dists/stable/InRelease"
   verify_inrelease "$work/InRelease" "$work/Release"
 
   # An expired index could be an old signed copy replayed to hold back updates.
-  local until
+  local until until_s
   until=$(sed -n 's/^Valid-Until: //p' "$work/Release")
-  if [ -n "$until" ] && [ "$(date -d "$until" +%s)" -lt "$(date +%s)" ]; then
-    die "Anthropic's index expired on $until (stale mirror or replay); try again later"
+  if [ -z "$until" ] || ! until_s=$(date -d "$until" +%s 2>/dev/null); then
+    die "Anthropic's index has no readable Valid-Until date"
   fi
+  [ "$until_s" -ge "$(date +%s)" ] || die "Anthropic's index expired on $until (stale mirror or replay); try again later"
 
-  curl -fsSLo "$work/Packages" "$REPO/dists/stable/main/binary-$ARCH/Packages"
+  curl "${CURL_OPTS[@]}" -fsSLo "$work/Packages" "$REPO/dists/stable/main/binary-$ARCH/Packages"
   local want got
   want=$(awk -v p="main/binary-$ARCH/Packages" '/^SHA256:/{s=1;next} /^[^ ]/{s=0} s && $3==p {print $1}' "$work/Release")
   got=$(sha256sum "$work/Packages" | cut -d' ' -f1)
@@ -154,11 +162,17 @@ cmd_install() {
   IFS=$'\t' read -r version file sha <<< "$line"
   if [ -z "$version" ] || [ -z "$file" ] || [ -z "$sha" ]; then die "could not find claude-desktop in the index"; fi
   case "$file" in pool/main/c/claude-desktop/*.deb) ;; *) die "unexpected package path: $file" ;; esac
+  [ "${file#pool/main/c/claude-desktop/}" = "${file##*/}" ] || die "unexpected package path: $file"
 
   local current; current=$(installed_version)
   install_self
   if [ "$current" = "$version" ] && [ "$mode" != --force ]; then
     log "already up to date ($version)"; first_run_setup; return
+  fi
+  # A replayed older index (still inside Valid-Until) must not roll the app back.
+  if [ "$current" != none ] && [ "$mode" != --force ] \
+    && [ "$(printf '%s\n' "$current" "$version" | sort -V | tail -n1)" != "$version" ]; then
+    die "the index offers $version, older than the installed $current; use update --force to downgrade"
   fi
   if [ "$mode" = --auto ] && [ "$(cat "$STAGE_DIR/version" 2>/dev/null)" = "$version" ]; then
     log "$version is already downloaded and waits for the next launch"; return
@@ -168,7 +182,7 @@ cmd_install() {
   fi
 
   log "downloading $version (installed: $current)"
-  curl -fL --progress-bar -o "$work/pkg.deb" "$REPO/$file"
+  curl "${CURL_OPTS[@]}" -fL --progress-bar -o "$work/pkg.deb" "$REPO/$file"
   [ "$(sha256sum "$work/pkg.deb" | cut -d' ' -f1)" = "$sha" ] || die "package checksum mismatch"
 
   log "unpacking"
@@ -344,7 +358,7 @@ cmd_uninstall() {
 }
 
 # Sourced (by tests): define functions only.
-[ "${BASH_SOURCE[0]}" = "$0" ] || return 0
+[ "${BASH_SOURCE[0]:-$0}" = "$0" ] || return 0
 
 case "${1:-}" in
   install|update) cmd_install "${2:-}" ;;

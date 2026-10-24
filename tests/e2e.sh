@@ -7,7 +7,8 @@ SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/claude-desktop-rpm.sh"
 export CLAUDE_DESKTOP_PREFIX
 CLAUDE_DESKTOP_PREFIX=$(mktemp -d)
 P=$CLAUDE_DESKTOP_PREFIX
-trap 'rm -rf "$P"' EXIT
+running=
+trap 'kill $running 2>/dev/null; rm -rf "$P"' EXIT
 
 pass=0
 fail() { echo "FAIL: $*" >&2; exit 1; }
@@ -29,26 +30,42 @@ check "search provider runs from the install" grep -q "gjs -m $P/lib/claude-desk
   "$P/share/dbus-1/services/com.anthropic.Claude.SearchProvider.service"
 
 echo "== signature must come from the pinned key"
-# A key.asc carrying Anthropic's key plus a second key, which signs a fake index.
-g=$(mktemp -d); trap 'rm -rf "$P" "$g"' EXIT
-curl -fsSL https://downloads.claude.ai/claude-desktop/key.asc -o "$g/key.asc"
-curl -fsSL https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/InRelease -o "$g/InRelease"
-verify() { GNUPGHOME="$g/gpg" bash -c 'source "$1"; verify_inrelease "$2" "$3"' _ "$SCRIPT" "$@" 2>/dev/null; }
-mkdir -m 700 "$g/gpg"
-GNUPGHOME="$g/gpg" gpg -q --import "$g/key.asc" 2>/dev/null
-GNUPGHOME="$g/gpg" gpg -q --batch --passphrase '' --quick-gen-key attacker@example.invalid ed25519 sign never 2>/dev/null
-printf 'Origin: fake\n' | GNUPGHOME="$g/gpg" gpg -q --batch --clearsign > "$g/Fake" 2>/dev/null
-check "real index accepted" verify "$g/InRelease" "$g/out"
-rejects() { ! verify "$@"; }
-check "index signed by another key rejected" rejects "$g/Fake" "$g/out2"
+# key.asc with Anthropic's key plus a second key that signs a fake index.
+g=$P/.sigtest; mkdir -p "$g"
+curl -fsSL --retry 3 https://downloads.claude.ai/claude-desktop/key.asc -o "$g/key.asc"
+curl -fsSL --retry 3 https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/InRelease -o "$g/InRelease"
+mkdir -m 700 "$g/gpg"; export GNUPGHOME=$g/gpg
+gpg -q --import "$g/key.asc" 2>/dev/null
+gpg -q --batch --passphrase '' --quick-gen-key attacker@example.invalid ed25519 sign never 2>/dev/null
+atk=$(gpg --with-colons -k attacker@example.invalid 2>/dev/null | awk -F: '/^fpr/ {print $10; exit}')
+printf 'Origin: fake\n' | gpg -q --batch --clearsign > "$g/Fake" 2>/dev/null
+# A pinned key that expired: made and used 10 days ago, valid for 1 day.
+old=$(date -d '-10 days' +%Y%m%dT%H%M%S)
+gpg -q --batch --passphrase '' --faked-system-time "$old" --quick-gen-key expired@example.invalid ed25519 sign 1d 2>/dev/null
+exp=$(gpg --with-colons -k expired@example.invalid 2>/dev/null | awk -F: '/^fpr/ {print $10; exit}')
+printf 'Origin: old\n' | gpg -q --batch --faked-system-time "$old" -u "$exp" --clearsign > "$g/Old" 2>/dev/null
+{ cat "$g/InRelease"; printf 'SHA256:\n deadbeef 1 main/binary-amd64/Packages\n'; } > "$g/Appended"
+# verify [pin] file: run the script's verify_inrelease, optionally with another pinned key.
+verify() { bash -c 'source "$1"; KEY_FPR=${3:-$KEY_FPR}; verify_inrelease "$2" "$2.out"' _ "$SCRIPT" "$@"; }
+rejects() { local err; err=$(verify "$@" 2>&1) && return 1; grep -q "not signed by Anthropic's key" <<< "$err"; }
+check "fake index is really signed by the second key" verify "$g/Fake" "$atk"
+check "real index accepted" verify "$g/InRelease"
+check "index signed by the second key rejected" rejects "$g/Fake"
+check "expired pinned key rejected" rejects "$g/Old" "$exp"
+dropped() { verify "$g/Appended" && ! grep -q deadbeef "$g/Appended.out"; }
+check "unsigned text after the signature is dropped" dropped
+gpgconf --kill gpg-agent 2>/dev/null || true; unset GNUPGHOME
 
 echo "== update when current"
 check "no re-download when current" grep -q "already up to date" <<< "$("$SCRIPT" update)"
 check "version command" grep -q "installed: $v" <<< "$("$SCRIPT" version)"
+echo 999.0.0 > "$P/lib/claude-desktop/.deb-version"
+check "refuses to downgrade" grep -q "older than the installed 999.0.0" <<< "$("$SCRIPT" update 2>&1 || true)"
+echo "$v" > "$P/lib/claude-desktop/.deb-version"
 
 echo "== launcher picks the theme"
 # Swap the app for a stub that prints GTK_THEME, and fake gsettings.
-fake=$(mktemp -d); trap 'rm -rf "$P" "$fake"' EXIT
+fake=$P/.fake; mkdir -p "$fake"
 mv "$P/lib/claude-desktop/claude-desktop" "$fake/real"
 # shellcheck disable=SC2016 # the stub expands GTK_THEME when it runs
 printf '#!/bin/sh\necho "theme=${GTK_THEME:-}"\n' > "$P/lib/claude-desktop/claude-desktop"
