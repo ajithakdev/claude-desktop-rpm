@@ -9,7 +9,6 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 - A signature from an expired or revoked Anthropic key is refused, and so is an index without a `Valid-Until` date.
 - `update` refuses to install an older version than the one installed, so a replayed index can't roll the app back. `update --force` still can.
 - Downloads time out on dead connections instead of hanging the update timer, and never follow a redirect off HTTPS.
-- The script works again when piped into `bash`.
 
 ## [1.1.0] - 2026-10-24
 
