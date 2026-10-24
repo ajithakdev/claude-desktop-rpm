@@ -4,6 +4,10 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-25
+
+Security release (#7). To upgrade from 1.1.0, download the new script and run `./claude-desktop-rpm.sh install` once. The daily timer updates the app, not this script.
+
 ### Added
 - `tests/mock-repo.sh`: attack tests that run full installs against a fake repository with tampered signatures, checksums, expiry dates and versions. CI runs them on every PR.
 - Releases are published by a workflow when a `vX.Y.Z` tag is pushed. Each release attaches a `SHA256SUMS` file for the script.
@@ -44,6 +48,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ajithakdev/claude-desktop-rpm/releases/tag/v1.0.0
