@@ -4,6 +4,8 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-24
+
 ### Added
 - Automatic updates. A daily systemd user timer checks Anthropic's repository. If Claude is closed, the update installs right away; if it is open, the update is downloaded and verified, then installed the next time you open Claude. Turn it off with `auto-update off`.
 - `doctor` checks the install, tray icon, keyring, Quick Entry hotkey and every Cowork requirement, and prints the fix for each problem.
@@ -32,5 +34,6 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ajithakdev/claude-desktop-rpm/releases/tag/v1.0.0
