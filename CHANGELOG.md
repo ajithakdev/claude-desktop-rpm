@@ -4,6 +4,10 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- `tests/mock-repo.sh`: attack tests that run full installs against a fake repository with tampered signatures, checksums, expiry dates and versions. CI runs them on every PR.
+- Releases are published by a workflow when a `vX.Y.Z` tag is pushed. Each release attaches a `SHA256SUMS` file for the script.
+
 ### Fixed
 - Security: the repository index now has to be signed by Anthropic's pinned key itself. Before, the script checked that `key.asc` contained that key but accepted a signature from any key in the file, so a tampered `key.asc` with a second key could sign a fake index. Reported by Marko Jokinen on Fedora Discussion.
 - A signature from an expired or revoked Anthropic key is refused, and so is an index without a `Valid-Until` date.

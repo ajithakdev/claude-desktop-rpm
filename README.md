@@ -131,8 +131,9 @@ Bug reports, test reports from other desktops and distros, and fixes are all wel
 
 ```bash
 git clone https://github.com/ajithakdev/claude-desktop-rpm && cd claude-desktop-rpm
-shellcheck claude-desktop-rpm.sh tests/e2e.sh
-tests/e2e.sh   # installs into a temp folder, never touches your own install
+shellcheck claude-desktop-rpm.sh tests/*.sh
+tests/mock-repo.sh   # attack tests against a fake repository, offline
+tests/e2e.sh         # installs into a temp folder, never touches your own install
 ```
 
 Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
@@ -155,6 +156,10 @@ Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](h
     <img alt="Star history" src="https://api.star-history.com/svg?repos=ajithakdev/claude-desktop-rpm&type=Date" />
   </picture>
 </a>
+
+## Credits
+
+Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7).
 
 ## License
 
