@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [main]
     paths-ignore: ['**.md', 'docs/**']
+  schedule:
+    - cron: '17 6 * * 1' # Mondays: catch upstream package changes that break the script
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,11 +19,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      # shellcheck ships on the ubuntu runner image, so nothing to install.
-      - run: bash -n claude-desktop-rpm.sh
-      - run: shellcheck claude-desktop-rpm.sh
+      # shellcheck, curl, gpg, ar and tar ship on the ubuntu runner image.
+      - run: bash -n claude-desktop-rpm.sh tests/e2e.sh
+      - run: shellcheck claude-desktop-rpm.sh tests/e2e.sh
+      - name: End-to-end install from Anthropic into a temp prefix
+        run: tests/e2e.sh
