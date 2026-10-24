@@ -21,6 +21,17 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/claude-desktop-rpm.sh | Direct download of the latest script |
 | https://code.claude.com/docs/en/desktop-linux | Anthropic's official Linux docs (Debian and Ubuntu) |
 
+### Where it's posted
+
+| Link | Use it for |
+| --- | --- |
+| https://dev.to/ajithakdev/how-i-install-claude-desktop-on-fedora-44-the-official-linux-build-no-root-5gcc | The article (original; Medium and Hashnode point back to it) |
+| https://medium.com/@ajithakdev/how-i-install-claude-desktop-on-fedora-44-the-official-linux-build-no-root-adca95163f6a | Article copy on Medium |
+| https://ajithakdev.hashnode.dev/install-claude-desktop-fedora | Article copy on Hashnode |
+| https://discussion.fedoraproject.org/t/205947 | Fedora Discussion thread: answer user questions here |
+| https://discussion.fedoraproject.org/t/205949 | Fedora Magazine article proposal |
+| https://alternativeto.net/software/claude-desktop-rpm/ | AlternativeTo listing (in the free review queue) |
+
 ### Behind the scenes
 
 | Link | Use it for |
