@@ -19,6 +19,10 @@ Anthropic ships Claude Desktop for Linux only as a `.deb` for Ubuntu and Debian.
 
 No root for the app, no third-party package repository, and no changes to Anthropic's files.
 
+<p align="center">
+  <img src="docs/images/claude-desktop-fedora-dark.png" width="820" alt="Claude Desktop running on Fedora 44 GNOME in dark mode" />
+</p>
+
 ## Install
 
 ```bash
