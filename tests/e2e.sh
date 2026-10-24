@@ -28,6 +28,20 @@ check "search provider ini" test -f "$P/share/gnome-shell/search-providers/com.a
 check "search provider runs from the install" grep -q "gjs -m $P/lib/claude-desktop/resources/gnome-search-provider/searchProvider.js" \
   "$P/share/dbus-1/services/com.anthropic.Claude.SearchProvider.service"
 
+echo "== signature must come from the pinned key"
+# A key.asc carrying Anthropic's key plus a second key, which signs a fake index.
+g=$(mktemp -d); trap 'rm -rf "$P" "$g"' EXIT
+curl -fsSL https://downloads.claude.ai/claude-desktop/key.asc -o "$g/key.asc"
+curl -fsSL https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/InRelease -o "$g/InRelease"
+verify() { GNUPGHOME="$g/gpg" bash -c 'source "$1"; verify_inrelease "$2" "$3"' _ "$SCRIPT" "$@" 2>/dev/null; }
+mkdir -m 700 "$g/gpg"
+GNUPGHOME="$g/gpg" gpg -q --import "$g/key.asc" 2>/dev/null
+GNUPGHOME="$g/gpg" gpg -q --batch --passphrase '' --quick-gen-key attacker@example.invalid ed25519 sign never 2>/dev/null
+printf 'Origin: fake\n' | GNUPGHOME="$g/gpg" gpg -q --batch --clearsign > "$g/Fake" 2>/dev/null
+check "real index accepted" verify "$g/InRelease" "$g/out"
+rejects() { ! verify "$@"; }
+check "index signed by another key rejected" rejects "$g/Fake" "$g/out2"
+
 echo "== update when current"
 check "no re-download when current" grep -q "already up to date" <<< "$("$SCRIPT" update)"
 check "version command" grep -q "installed: $v" <<< "$("$SCRIPT" version)"

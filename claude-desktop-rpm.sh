@@ -39,6 +39,16 @@ need() {
 installed_version() { cat "$VERSION_FILE" 2>/dev/null || echo none; }
 app_running() { pgrep -f "^$APP_DIR/claude-desktop" >/dev/null; }
 
+# Writes the signed text of $1 to $2, only if the pinned key itself made the signature.
+# A good signature alone is not enough: key.asc could carry a second key.
+verify_inrelease() {
+  local status=$2.status
+  gpg -q --status-fd 3 --decrypt "$1" 3>"$status" >"$2" 2>/dev/null || die "InRelease signature check failed"
+  # VALIDSIG's last field is the primary key fingerprint of the signer.
+  awk -v k="$KEY_FPR" '$2 == "VALIDSIG" && $NF == k { ok = 1 } END { exit !ok }' "$status" \
+    || die "InRelease is not signed by Anthropic's key ($KEY_FPR)"
+}
+
 # Prints "version<TAB>filename<TAB>sha256" of the newest package in the signed index.
 latest_package() {
   local work=$1
@@ -48,8 +58,7 @@ latest_package() {
   gpg --with-colons --list-keys | grep -q "^fpr:::::::::$KEY_FPR:" || die "signing key fingerprint mismatch"
 
   curl -fsSLo "$work/InRelease" "$REPO/dists/stable/InRelease"
-  # --decrypt prints only the signed text, and fails on a bad signature.
-  gpg -q --decrypt "$work/InRelease" > "$work/Release" 2>/dev/null || die "InRelease signature check failed"
+  verify_inrelease "$work/InRelease" "$work/Release"
 
   # An expired index could be an old signed copy replayed to hold back updates.
   local until
@@ -333,6 +342,9 @@ cmd_uninstall() {
   update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
   log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude are kept)"
 }
+
+# Sourced (by tests): define functions only.
+[ "${BASH_SOURCE[0]}" = "$0" ] || return 0
 
 case "${1:-}" in
   install|update) cmd_install "${2:-}" ;;

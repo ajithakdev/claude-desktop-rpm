@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Fixed
+- Security: the repository index now has to be signed by Anthropic's pinned key itself. Before, the script checked that `key.asc` contained that key but accepted a signature from any key in the file, so a tampered `key.asc` with a second key could sign a fake index. Reported by Marko Jokinen on Fedora Discussion.
+
 ## [1.1.0] - 2026-10-24
 
 ### Added
