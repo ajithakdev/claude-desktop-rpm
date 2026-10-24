@@ -63,7 +63,7 @@ Want Cowork (Claude's agent mode that runs in a VM)? Run `claude-desktop-rpm cow
 - **Cowork works.** Installs QEMU, OVMF and virtiofsd, and links Fedora's firmware where the app looks for it.
 - **GNOME search.** Your Claude sessions show up in the Activities search.
 - **`doctor`** finds what's missing (tray extension, keyring, KVM group, portals) and tells you the exact fix.
-- **No root.** The app lives in `~/.local`. Only `cowork` uses sudo, to install system packages.
+- **No root for the app.** It lives in `~/.local`. Only the opt-in `cowork` command uses sudo, to install Fedora packages and set up KVM.
 - **Clean uninstall.** `claude-desktop-rpm uninstall` removes everything it added and keeps your chats.
 
 ## Why this one
@@ -95,7 +95,7 @@ Pick this one if you want Anthropic's exact build with no extra signing key in y
 ## How it works
 
 1. Fetch Anthropic's signing key and check its fingerprint (`31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`).
-2. Verify the repository's `InRelease` signature and make sure it hasn't expired.
+2. Verify that `InRelease` is signed by that exact key, and that it hasn't expired.
 3. Check the `Packages` index against `InRelease`, and the `.deb` against `Packages`.
 4. Unpack the `.deb` into `~/.local/lib/claude-desktop` in one atomic swap, and add a launcher, menu entry, icons and the `claude://` sign-in handler.
 5. A systemd user timer repeats this daily. If Claude is open, the verified update is staged and the launcher puts it in place before the next start.
