@@ -65,7 +65,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Not sure what's wrong | `claude-desktop-rpm doctor` |
 | Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
 | "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
-| No tray icon on GNOME | `sudo dnf install gnome-shell-extension-appindicator`, log out and in, then `gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com` |
+| No tray icon on GNOME | `gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com`. If that says it doesn't exist, first `sudo dnf install gnome-shell-extension-appindicator` (in a real terminal) and log out and in |
 | System theme stays light | Run `claude-desktop-rpm update --force` once to get the new launcher, then reopen Claude |
 | App says "Update available" | Its link points to apt. Ignore it, or quit Claude and run `claude-desktop-rpm update` |
 | Signed out on every launch | Your keyring is missing or locked: `sudo dnf install gnome-keyring` and unlock it |

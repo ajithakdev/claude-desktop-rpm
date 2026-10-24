@@ -240,13 +240,21 @@ cmd_auto_update() {
   esac
 }
 
+TRAY_EXT=appindicatorsupport@rgcjonas.gmail.com
 tray_on_gnome() { gnome-extensions list --enabled 2>/dev/null | grep -q appindicator; }
+# Installed but off needs only the enable step.
+tray_fix() {
+  if gnome-extensions info "$TRAY_EXT" >/dev/null 2>&1; then
+    echo "gnome-extensions enable $TRAY_EXT"
+  else
+    echo "sudo dnf install gnome-shell-extension-appindicator, log out and in, then gnome-extensions enable $TRAY_EXT"
+  fi
+}
 
 tray_hint() {
   [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]] && ! tray_on_gnome || return 0
-  log "GNOME hides tray icons, and Claude's tray menu has Quit. To show it:"
-  echo "    sudo dnf install gnome-shell-extension-appindicator"
-  echo "    then log out and in, and run: gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com"
+  log "GNOME hides tray icons, and Claude's tray menu has Quit. To show it, run:"
+  echo "    $(tray_fix)"
 }
 
 our_launcher()      { grep -q claude-desktop-rpm "$BIN_DIR/claude-desktop"; }
@@ -277,7 +285,7 @@ cmd_doctor() {
   echo "Desktop"
   if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
     probe "tray icon (AppIndicator extension on)" "tray icon hidden: GNOME needs the AppIndicator extension" \
-      "sudo dnf install gnome-shell-extension-appindicator, log out and in, then gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com" tray_on_gnome
+      "$(tray_fix)" tray_on_gnome
   fi
   probe "keyring (sign-in is saved)" "no keyring: you will sign in on every launch" \
     "sudo dnf install gnome-keyring (or use KDE Wallet on Plasma), then unlock it" keyring_running
