@@ -6,6 +6,10 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ### Fixed
 - Security: the repository index now has to be signed by Anthropic's pinned key itself. Before, the script checked that `key.asc` contained that key but accepted a signature from any key in the file, so a tampered `key.asc` with a second key could sign a fake index. Reported by Marko Jokinen on Fedora Discussion.
+- A signature from an expired or revoked Anthropic key is refused, and so is an index without a `Valid-Until` date.
+- `update` refuses to install an older version than the one installed, so a replayed index can't roll the app back. `update --force` still can.
+- Downloads time out on dead connections instead of hanging the update timer, and never follow a redirect off HTTPS.
+- The script works again when piped into `bash`.
 
 ## [1.1.0] - 2026-10-24
 

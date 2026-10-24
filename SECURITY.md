@@ -5,8 +5,8 @@
 The script downloads Claude Desktop only from Anthropic's own repository at `downloads.claude.ai` and refuses to install unless every check passes:
 
 1. Anthropic's signing key has the fingerprint `31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`, the one Anthropic publishes in its [Linux install docs](https://code.claude.com/docs/en/desktop-linux).
-2. The repository's `InRelease` file is signed by that key itself (gpg's `VALIDSIG` status must name it), not just by any key that came in `key.asc`.
-3. `InRelease` is not past its `Valid-Until` date, so an old signed index can't be replayed.
+2. The repository's `InRelease` file has a good signature from that key or one of its subkeys (gpg's `VALIDSIG` must name it as the primary key), not just from any key that came in `key.asc`. A signature from an expired or revoked key is refused.
+3. `InRelease` has a `Valid-Until` date and is not past it, so an old signed index can only be replayed while it is still valid. Within that window the script also refuses to install a version older than the one you have (`update --force` overrides).
 4. The `Packages` index matches the checksum in `InRelease`.
 5. The `.deb` matches the checksum in `Packages`.
 
