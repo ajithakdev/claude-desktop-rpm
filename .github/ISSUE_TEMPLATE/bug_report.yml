@@ -1,0 +1,32 @@
+name: Bug report
+description: The installer, updater or Cowork setup failed or did the wrong thing.
+labels: [bug]
+body:
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: ./claude-desktop-rpm.sh update
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Full output
+      description: Paste everything the script printed.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Fedora version, desktop and CPU
+      description: "Output of: cat /etc/fedora-release; echo $XDG_CURRENT_DESKTOP; uname -m"
+      placeholder: Fedora release 44, GNOME, x86_64
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Installed Claude Desktop version
+      description: "Output of: ./claude-desktop-rpm.sh version"

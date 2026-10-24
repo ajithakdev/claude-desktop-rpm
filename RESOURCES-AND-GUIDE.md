@@ -1,4 +1,4 @@
-# claude-desktop-fedora: resources and guide
+# claude-desktop-rpm: resources and guide
 
 Every link for the Claude Desktop Fedora installer, what it is for, and how to run it. Passwords and keys are never written here.
 
@@ -16,7 +16,9 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 
 | Link | Use it for |
 | --- | --- |
-| https://github.com/ajithakdev/claude-desktop-fedora | Source code and installation instructions |
+| https://github.com/ajithakdev/claude-desktop-rpm | Source code and installation instructions |
+| https://github.com/ajithakdev/claude-desktop-rpm/releases | Releases; each one has the script attached |
+| https://github.com/ajithakdev/claude-desktop-rpm/actions | CI (ShellCheck) runs |
 
 ### Behind the scenes
 
@@ -36,12 +38,14 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Job | How |
 | --- | --- |
 | Install dependencies | `sudo dnf install curl gnupg2 binutils tar` |
-| Install | `./claude-desktop-fedora.sh install` |
-| Update | Quit Claude Desktop, then run `./claude-desktop-fedora.sh update` |
-| Force reinstall | `./claude-desktop-fedora.sh update --force` |
-| Set up Cowork | `./claude-desktop-fedora.sh cowork`, then log out and back in |
-| Check version | `./claude-desktop-fedora.sh version` |
-| Uninstall | `./claude-desktop-fedora.sh uninstall` |
+| Install | `./claude-desktop-rpm.sh install` |
+| Update | Quit Claude Desktop, then run `./claude-desktop-rpm.sh update` |
+| Force reinstall | `./claude-desktop-rpm.sh update --force` |
+| Set up Cowork | `./claude-desktop-rpm.sh cowork`, then log out and back in |
+| Check version | `./claude-desktop-rpm.sh version` |
+| Uninstall | `./claude-desktop-rpm.sh uninstall` |
+| Lint | `shellcheck claude-desktop-rpm.sh` (CI runs it too) |
+| Release | Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, push the tag, then `gh release create vX.Y.Z claude-desktop-rpm.sh --title vX.Y.Z --notes "<that section>"` |
 
 ## When something goes wrong
 
@@ -55,6 +59,9 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 
 ## More detail
 
-- `claude-desktop-fedora.sh`: installer script and Cowork setup
+- `claude-desktop-rpm.sh`: installer script and Cowork setup
 - `README.md`: usage guide, verification steps, and limits
+- `CHANGELOG.md`: what changed in each release
+- `SECURITY.md`: what the script trusts and how to report a problem
+- `.github/CONTRIBUTING.md`: how to test a change
 - `LICENSE`: MIT license terms

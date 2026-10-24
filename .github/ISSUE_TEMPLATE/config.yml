@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ajithakdev/claude-desktop-rpm/blob/main/SECURITY.md
+    about: Report security issues privately, not as a public issue.
+  - name: Claude Desktop itself
+    url: https://support.claude.com
+    about: Bugs in the app (not in this installer) go to Anthropic.

@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      # shellcheck ships on the ubuntu runner image, so nothing to install.
+      - run: bash -n claude-desktop-rpm.sh
+      - run: shellcheck claude-desktop-rpm.sh

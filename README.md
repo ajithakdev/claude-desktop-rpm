@@ -1,4 +1,8 @@
-# claude-desktop-fedora
+# claude-desktop-rpm
+
+[![CI](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml/badge.svg)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Every link and how-to is in [RESOURCES-AND-GUIDE.md](RESOURCES-AND-GUIDE.md).
 
@@ -10,9 +14,17 @@ Unofficial and not affiliated with Anthropic. The repo holds one shell script an
 
 ```bash
 sudo dnf install curl gnupg2 binutils tar
-git clone https://github.com/ajithakdev/claude-desktop-fedora
-cd claude-desktop-fedora
-./claude-desktop-fedora.sh install
+git clone https://github.com/ajithakdev/claude-desktop-rpm
+cd claude-desktop-rpm
+./claude-desktop-rpm.sh install
+```
+
+Or skip the clone and grab the script from the latest release:
+
+```bash
+curl -fLO https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/claude-desktop-rpm.sh
+chmod +x claude-desktop-rpm.sh
+./claude-desktop-rpm.sh install
 ```
 
 Open Claude from the app menu and sign in. The app itself needs no sudo.
@@ -34,7 +46,7 @@ The app does not update itself. Quit it, then run `update`.
 Cowork runs tasks in a QEMU/KVM virtual machine. Turn on SVM or VT-x in your BIOS, then run:
 
 ```bash
-./claude-desktop-fedora.sh cowork
+./claude-desktop-rpm.sh cowork
 ```
 
 It installs `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd`, loads `vhost_vsock` at boot, and adds you to the `kvm` group. Log out and back in afterwards. The first Cowork task downloads the VM image, so it starts slowly.
@@ -68,6 +80,14 @@ The script stops on any failed check:
 - Anthropic does not support Fedora, so a new release can break this script.
 - The GNOME search provider and the AppArmor profile from the `.deb` are not installed.
 - The Linux beta has no Computer Use or dictation.
+
+## Moving from claude-desktop-fedora
+
+This repo used to be called claude-desktop-fedora. Your install in `~/.local` is the same; just use `claude-desktop-rpm.sh` from now on.
+
+## Contributing and security
+
+See [CONTRIBUTING](.github/CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
