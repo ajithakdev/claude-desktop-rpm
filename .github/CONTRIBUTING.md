@@ -6,16 +6,17 @@ The whole project is one Bash script, `claude-desktop-rpm.sh`. Keep it that way:
 
 ```bash
 sudo dnf install ShellCheck
-shellcheck claude-desktop-rpm.sh tests/e2e.sh
+shellcheck claude-desktop-rpm.sh tests/*.sh
+tests/mock-repo.sh                        # attack tests against a fake repo, offline, 2 seconds
 tests/e2e.sh                              # real install into a temp folder
 ./claude-desktop-rpm.sh update --force    # then try it on your own install
 ```
 
-CI runs ShellCheck and `tests/e2e.sh` on every push and PR. Before a release, go through [docs/TESTING.md](../docs/TESTING.md).
+CI runs ShellCheck, `tests/mock-repo.sh` and `tests/e2e.sh` on every push and PR. Before a release, go through [docs/TESTING.md](../docs/TESTING.md).
 
 ## Rules
 
-- Never weaken the verification steps (key fingerprint, `InRelease` signature, both checksums). A PR that skips one will be closed.
+- Never weaken the verification steps (key fingerprint, `InRelease` signed by that key, `Valid-Until`, no downgrade, both checksums). A PR that skips one will be closed. A new check gets a tampered case in `tests/mock-repo.sh`.
 - The app installs to `~/.local` without sudo. Only `cowork` may use sudo.
 - Never patch files inside Anthropic's app. Fixes go in the launcher, the desktop entry, or system setup.
 - Add a line to `CHANGELOG.md` under `## [Unreleased]`.

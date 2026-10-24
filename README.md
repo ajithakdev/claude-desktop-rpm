@@ -63,7 +63,7 @@ Want Cowork (Claude's agent mode that runs in a VM)? Run `claude-desktop-rpm cow
 - **Cowork works.** Installs QEMU, OVMF and virtiofsd, and links Fedora's firmware where the app looks for it.
 - **GNOME search.** Your Claude sessions show up in the Activities search.
 - **`doctor`** finds what's missing (tray extension, keyring, KVM group, portals) and tells you the exact fix.
-- **No root.** The app lives in `~/.local`. Only `cowork` uses sudo, to install system packages.
+- **No root for the app.** It lives in `~/.local`. Only the opt-in `cowork` command uses sudo, to install Fedora packages and set up KVM.
 - **Clean uninstall.** `claude-desktop-rpm uninstall` removes everything it added and keeps your chats.
 
 ## Why this one
@@ -95,7 +95,7 @@ Pick this one if you want Anthropic's exact build with no extra signing key in y
 ## How it works
 
 1. Fetch Anthropic's signing key and check its fingerprint (`31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`).
-2. Verify the repository's `InRelease` signature and make sure it hasn't expired.
+2. Verify that `InRelease` is signed by that exact key, and that it hasn't expired.
 3. Check the `Packages` index against `InRelease`, and the `.deb` against `Packages`.
 4. Unpack the `.deb` into `~/.local/lib/claude-desktop` in one atomic swap, and add a launcher, menu entry, icons and the `claude://` sign-in handler.
 5. A systemd user timer repeats this daily. If Claude is open, the verified update is staged and the launcher puts it in place before the next start.
@@ -131,8 +131,9 @@ Bug reports, test reports from other desktops and distros, and fixes are all wel
 
 ```bash
 git clone https://github.com/ajithakdev/claude-desktop-rpm && cd claude-desktop-rpm
-shellcheck claude-desktop-rpm.sh tests/e2e.sh
-tests/e2e.sh   # installs into a temp folder, never touches your own install
+shellcheck claude-desktop-rpm.sh tests/*.sh
+tests/mock-repo.sh   # attack tests against a fake repository, offline
+tests/e2e.sh         # installs into a temp folder, never touches your own install
 ```
 
 Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
@@ -155,6 +156,10 @@ Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](h
     <img alt="Star history" src="https://api.star-history.com/svg?repos=ajithakdev/claude-desktop-rpm&type=Date" />
   </picture>
 </a>
+
+## Credits
+
+Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7).
 
 ## License
 

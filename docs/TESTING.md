@@ -5,13 +5,18 @@ Run the automated test first, then the manual checks that need a real desktop. T
 ## Automated
 
 ```bash
-shellcheck claude-desktop-rpm.sh tests/e2e.sh
+shellcheck claude-desktop-rpm.sh tests/*.sh
+tests/mock-repo.sh
 tests/e2e.sh
 ```
+
+`tests/mock-repo.sh` serves a fake repository on 127.0.0.1 and runs full installs into temporary folders. It checks that each of these is refused: a signature from a second key in `key.asc`, a `key.asc` without Anthropic's key, a bad signature, an expired index, a missing `Valid-Until`, a tampered `Packages`, a tampered `.deb`, an odd package path, and an older version. It also checks that a clean fake repository installs.
 
 `tests/e2e.sh` downloads the real package from Anthropic and installs it into a temporary folder, so it never touches `~/.local`. It checks:
 
 - [ ] the signing key, `InRelease` signature and both checksums pass (any failure stops the install)
+- [ ] Anthropic's real index is accepted; an index signed by a second key in `key.asc`, or by an expired pinned key, is refused; unsigned text after the signature is dropped
+- [ ] `update` refuses to install an older version
 - [ ] the app, version file, launcher, menu entry, `claude://` handler, icons, search provider and the script's own copy are in place
 - [ ] `update` does nothing when the version is current
 - [ ] `version` prints the installed version

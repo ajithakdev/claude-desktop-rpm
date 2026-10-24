@@ -8,7 +8,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 - Updates arrive by themselves every day. If Claude is open, the update waits and installs the next time you open it.
 - Something wrong? Run `claude-desktop-rpm doctor`. It says what to fix.
 - Cowork needs `claude-desktop-rpm cowork` once, then log out and in.
-- Releases: tag `vX.Y.Z` and attach the script (steps below).
+- Releases: push a `vX.Y.Z` tag; the Release workflow tests and publishes it (steps below).
 
 ## Links and what each one is for
 
@@ -64,10 +64,12 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Auto-update on, off, state | `claude-desktop-rpm auto-update on`, `off`, or no argument |
 | See the next update check | `systemctl --user list-timers claude-desktop-rpm-update.timer` |
 | Update log | `journalctl --user -u claude-desktop-rpm-update` |
-| Lint | `shellcheck claude-desktop-rpm.sh tests/e2e.sh` |
+| Lint | `shellcheck claude-desktop-rpm.sh tests/*.sh` |
+| Attack tests | `tests/mock-repo.sh` (fake repository on 127.0.0.1: tampered signatures, checksums, expiry, downgrade) |
 | Test end to end | `tests/e2e.sh` (installs into a temp folder, never touches `~/.local`) |
 | Manual checklist | [docs/TESTING.md](docs/TESTING.md) |
-| Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, push the tag, then `gh release create vX.Y.Z claude-desktop-rpm.sh --title vX.Y.Z --notes "<that section>"` |
+| Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z` on main, then `git tag vX.Y.Z && git push origin vX.Y.Z`. The Release workflow reruns every check, then publishes the release with the script, `SHA256SUMS` and that CHANGELOG section as notes |
+| Versions | Patch for fixes (security fixes ship the same day), minor for new commands or features |
 
 ## Files it writes
 
