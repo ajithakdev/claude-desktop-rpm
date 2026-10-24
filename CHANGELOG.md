@@ -4,6 +4,11 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-25
+
+### Fixed
+- `install` no longer tells you to enable the AppIndicator extension when it is already on. The check sometimes failed because of how its pipe was written, so `doctor` and `install` could disagree.
+
 ## [1.1.1] - 2026-10-25
 
 Security release (#7). To upgrade from 1.1.0, download the new script and run `./claude-desktop-rpm.sh install` once. The daily timer updates the app, not this script.
@@ -48,7 +53,8 @@ Security release (#7). To upgrade from 1.1.0, download the new script and run `.
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ajithakdev/claude-desktop-rpm/releases/tag/v1.0.0

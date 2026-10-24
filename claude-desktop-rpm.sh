@@ -264,7 +264,8 @@ cmd_auto_update() {
 }
 
 TRAY_EXT=appindicatorsupport@rgcjonas.gmail.com
-tray_on_gnome() { gnome-extensions list --enabled 2>/dev/null | grep -q appindicator; }
+# Not "| grep -q": grep quits early, gnome-extensions gets SIGPIPE, and pipefail fails the check.
+tray_on_gnome() { [[ $(gnome-extensions list --enabled 2>/dev/null) == *appindicator* ]]; }
 # Installed but off needs only the enable step.
 tray_fix() {
   if gnome-extensions info "$TRAY_EXT" >/dev/null 2>&1; then
