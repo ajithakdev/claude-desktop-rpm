@@ -6,10 +6,13 @@ The script downloads Claude Desktop only from Anthropic's own repository at `dow
 
 1. Anthropic's signing key has the fingerprint `31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`.
 2. The repository's `InRelease` file is signed by that key.
-3. The `Packages` index matches the checksum in `InRelease`.
-4. The `.deb` matches the checksum in `Packages`.
+3. `InRelease` is not past its `Valid-Until` date, so an old signed index can't be replayed.
+4. The `Packages` index matches the checksum in `InRelease`.
+5. The `.deb` matches the checksum in `Packages`.
 
-The app installs into your home directory and runs without root. Only `cowork` uses sudo, to install Fedora packages and set up KVM.
+Automatic updates run the same checks. An update downloaded while Claude is open is verified before it is staged, and staged updates live in your own `~/.local`, so only your user can change them.
+
+The app installs into your home directory and runs without root; the script refuses to run as root. Only `cowork` uses sudo, to install Fedora packages and set up KVM.
 
 ## Supported versions
 

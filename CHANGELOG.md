@@ -4,6 +4,22 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- Automatic updates. A daily systemd user timer checks Anthropic's repository. If Claude is closed, the update installs right away; if it is open, the update is downloaded and verified, then installed the next time you open Claude. Turn it off with `auto-update off`.
+- `doctor` checks the install, tray icon, keyring, Quick Entry hotkey and every Cowork requirement, and prints the fix for each problem.
+- Anthropic's GNOME search provider is installed, so Claude sessions show up in the Activities search.
+- `install` tells you how to turn on GNOME's AppIndicator extension when it is off, since Claude's tray menu holds Quit.
+- The script copies itself to `~/.local/bin/claude-desktop-rpm`.
+- `tests/e2e.sh` installs from Anthropic into a temporary folder and checks every command, including an update that arrives while Claude is open. CI runs it on each push and every Monday.
+- `docs/TESTING.md`: the release checklist.
+
+### Fixed
+- The System theme now follows GNOME's dark style. Electron ignores that setting and reads only the GTK theme name, so the launcher sets `GTK_THEME=Adwaita:dark` when GNOME is dark.
+
+### Security
+- Installs and updates now refuse an `InRelease` index that is past its `Valid-Until` date, so an old signed index can't be replayed to keep you on an old version.
+- The script refuses to run as root.
+
 ## [1.0.0] - 2026-10-24
 
 ### Added

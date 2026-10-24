@@ -4,11 +4,11 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 
 ## TL;DR
 
-- Bash installer and updater for Anthropic's Claude Desktop Linux beta on Fedora.
-- Downloads the official Debian package from Anthropic and verifies its signature and checksums.
-- Installs the app into `~/.local` so it runs without root privileges.
-- Includes setup for the Cowork virtual machine environment on Fedora.
-- Preserves user configuration and chats in `~/.config/Claude` when uninstalled.
+- One Bash script installs Anthropic's official Claude Desktop (Linux beta) on Fedora into `~/.local`, after checking Anthropic's signature and checksums.
+- Updates arrive by themselves every day. If Claude is open, the update waits and installs the next time you open it.
+- Something wrong? Run `claude-desktop-rpm doctor`. It says what to fix.
+- Cowork needs `claude-desktop-rpm cowork` once, then log out and in.
+- Releases: tag `vX.Y.Z` and attach the script (steps below).
 
 ## Links and what each one is for
 
@@ -18,14 +18,16 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | --- | --- |
 | https://github.com/ajithakdev/claude-desktop-rpm | Source code and installation instructions |
 | https://github.com/ajithakdev/claude-desktop-rpm/releases | Releases; each one has the script attached |
-| https://github.com/ajithakdev/claude-desktop-rpm/actions | CI (ShellCheck) runs |
+| https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/claude-desktop-rpm.sh | Direct download of the latest script |
+| https://code.claude.com/docs/en/desktop-linux | Anthropic's official Linux docs (Debian and Ubuntu) |
 
 ### Behind the scenes
 
 | Link | Use it for |
 | --- | --- |
-| https://downloads.claude.ai/claude-desktop/apt/stable | Anthropic package repository for Claude Desktop |
-| https://downloads.claude.ai/claude-desktop/key.asc | Anthropic package signing key |
+| https://github.com/ajithakdev/claude-desktop-rpm/actions | CI: ShellCheck and the end-to-end install, every push and every Monday |
+| https://downloads.claude.ai/claude-desktop/apt/stable | Anthropic's package repository |
+| https://downloads.claude.ai/claude-desktop/key.asc | Anthropic's signing key (fingerprint `31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`) |
 
 ## Accounts
 
@@ -33,35 +35,50 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | --- | --- | --- |
 | GitHub | `ajithakdev` | Owner |
 
-## Run and release
+## User guide
+
+1. **Install.** Download the script from the latest release, then run `./claude-desktop-rpm.sh install`. Open Claude from the app menu and sign in.
+2. **Check setup.** Run `claude-desktop-rpm doctor` and follow any fix it prints.
+3. **Dark mode.** Pick System in Claude's settings. It follows GNOME's style each time Claude starts; after switching styles, quit and reopen Claude.
+4. **Update now.** Quit Claude (tray icon > Quit), then run `claude-desktop-rpm update`. Normally you don't need to: the daily check does it.
+5. **Cowork.** Run `claude-desktop-rpm cowork`, then log out and in.
+6. **Remove.** Quit Claude, then run `claude-desktop-rpm uninstall`. Your chats and sign-in stay in `~/.config/Claude`.
+
+## Admin guide
 
 | Job | How |
 | --- | --- |
 | Install dependencies | `sudo dnf install curl gnupg2 binutils tar` |
-| Install | `./claude-desktop-rpm.sh install` |
-| Update | Quit Claude Desktop, then run `./claude-desktop-rpm.sh update` |
-| Force reinstall | `./claude-desktop-rpm.sh update --force` |
-| Set up Cowork | `./claude-desktop-rpm.sh cowork`, then log out and back in |
-| Check version | `./claude-desktop-rpm.sh version` |
-| Uninstall | `./claude-desktop-rpm.sh uninstall` |
-| Lint | `shellcheck claude-desktop-rpm.sh` (CI runs it too) |
-| Release | Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, push the tag, then `gh release create vX.Y.Z claude-desktop-rpm.sh --title vX.Y.Z --notes "<that section>"` |
+| Force reinstall | `claude-desktop-rpm update --force` |
+| Auto-update on, off, state | `claude-desktop-rpm auto-update on`, `off`, or no argument |
+| See the next update check | `systemctl --user list-timers claude-desktop-rpm-update.timer` |
+| Update log | `journalctl --user -u claude-desktop-rpm-update` |
+| Lint | `shellcheck claude-desktop-rpm.sh tests/e2e.sh` |
+| Test end to end | `tests/e2e.sh` (installs into a temp folder, never touches `~/.local`) |
+| Manual checklist | [docs/TESTING.md](docs/TESTING.md) |
+| Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, push the tag, then `gh release create vX.Y.Z claude-desktop-rpm.sh --title vX.Y.Z --notes "<that section>"` |
 
 ## When something goes wrong
 
 | Problem | Fix |
 | --- | --- |
-| Missing required tools | Run `sudo dnf install curl gnupg2 binutils tar coreutils` |
-| App running during install or update | Quit Claude Desktop from tray icon, then rerun the command |
-| `/dev/kvm` missing during Cowork setup | Enable SVM or VT-x virtualization in your BIOS |
-| Cowork fails after setup | Log out and back in to apply the `kvm` group membership |
-| Package verification fails | The script halts if the Anthropic signing key or checksums do not match |
+| Not sure what's wrong | `claude-desktop-rpm doctor` |
+| Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
+| "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
+| No tray icon on GNOME | `gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com`. If that says it doesn't exist, first `sudo dnf install gnome-shell-extension-appindicator` (in a real terminal) and log out and in |
+| System theme stays light | Run `claude-desktop-rpm update --force` once to get the new launcher, then reopen Claude |
+| App says "Update available" | Its link points to apt. Ignore it, or quit Claude and run `claude-desktop-rpm update` |
+| Signed out on every launch | Your keyring is missing or locked: `sudo dnf install gnome-keyring` and unlock it |
+| Quick Entry hotkey does nothing on Wayland | Install your desktop's portal backend (`xdg-desktop-portal-gnome` or `-kde`) |
+| `/dev/kvm` missing | Turn on SVM or VT-x in your BIOS |
+| Cowork fails right after setup | Log out and back in so the `kvm` group applies |
+| "index expired" | Anthropic's index is past its `Valid-Until` date; try again later |
+| Verification fails | The script stops on a wrong key, bad signature or checksum. Don't work around it; open an issue |
 
 ## More detail
 
-- `claude-desktop-rpm.sh`: installer script and Cowork setup
-- `README.md`: usage guide, verification steps, and limits
-- `CHANGELOG.md`: what changed in each release
-- `SECURITY.md`: what the script trusts and how to report a problem
-- `.github/CONTRIBUTING.md`: how to test a change
-- `LICENSE`: MIT license terms
+- [README.md](README.md): what the script does, Fedora fixes, verification, limits
+- [docs/TESTING.md](docs/TESTING.md): release checklist
+- [CHANGELOG.md](CHANGELOG.md): what changed in each release
+- [SECURITY.md](SECURITY.md): what the script trusts and how to report a problem
+- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md): how to test a change
