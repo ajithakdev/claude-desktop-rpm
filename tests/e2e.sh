@@ -8,7 +8,7 @@ export CLAUDE_DESKTOP_PREFIX
 CLAUDE_DESKTOP_PREFIX=$(mktemp -d)
 P=$CLAUDE_DESKTOP_PREFIX
 running=
-trap 'kill $running 2>/dev/null; rm -rf "$P"' EXIT
+trap 'if [ -n "$running" ]; then kill "$running" 2>/dev/null || true; fi; rm -rf "$P"' EXIT
 
 pass=0
 fail() { echo "FAIL: $*" >&2; exit 1; }
