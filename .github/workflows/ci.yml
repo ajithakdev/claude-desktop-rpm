@@ -9,22 +9,27 @@ on:
   schedule:
     - cron: '17 6 * * 1' # Mondays: catch upstream package changes that break the script
   workflow_dispatch:
+  workflow_call: # release.yml runs the same checks before publishing
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      # shellcheck, curl, gpg, ar and tar ship on the ubuntu runner image.
-      - run: bash -n claude-desktop-rpm.sh tests/e2e.sh
-      - run: shellcheck claude-desktop-rpm.sh tests/e2e.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # shellcheck, curl, gpg, ar, tar and python3 ship on the ubuntu runner image.
+      - run: bash -n claude-desktop-rpm.sh tests/*.sh
+      - run: shellcheck claude-desktop-rpm.sh tests/*.sh
+      - name: Attack tests against a fake repository (offline)
+        run: tests/mock-repo.sh
       - name: End-to-end install from Anthropic into a temp prefix
         run: tests/e2e.sh
