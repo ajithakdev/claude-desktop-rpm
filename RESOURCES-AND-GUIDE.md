@@ -58,6 +58,24 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Manual checklist | [docs/TESTING.md](docs/TESTING.md) |
 | Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, push the tag, then `gh release create vX.Y.Z claude-desktop-rpm.sh --title vX.Y.Z --notes "<that section>"` |
 
+## Files it writes
+
+| Path | What |
+| --- | --- |
+| `~/.local/lib/claude-desktop/` | The app, unmodified |
+| `~/.local/lib/claude-desktop.staged/` | An update waiting for the next launch (only while one waits) |
+| `~/.local/bin/claude-desktop` | Launcher: dark mode, staged updates |
+| `~/.local/bin/claude-desktop-rpm` | This script |
+| `~/.local/bin/ccd` | Anthropic's `ccd` helper, linked from the app |
+| `~/.local/share/applications/com.anthropic.Claude.desktop` | Menu entry and `claude://` handler (sign-in needs it) |
+| `~/.local/share/mime/packages/com.anthropic.Claude.xml` | File types (`.mcpb`, `.skill`) |
+| `~/.local/share/icons/hicolor/*/apps/claude-desktop.png` | Icons |
+| `~/.local/share/gnome-shell/search-providers/`, `~/.local/share/dbus-1/services/` | GNOME search provider |
+| `~/.config/systemd/user/claude-desktop-rpm-update.{service,timer}` | Daily update check |
+| `~/.config/claude-desktop-rpm/no-auto-update` | Present only after `auto-update off` |
+| `~/.config/Claude/` | Your chats and sign-in (the app's own; uninstall keeps it) |
+| `/usr/share/OVMF/`, `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo) |
+
 ## When something goes wrong
 
 | Problem | Fix |

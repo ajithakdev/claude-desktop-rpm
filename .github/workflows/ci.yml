@@ -4,9 +4,8 @@ on:
   push:
     branches: [main]
     paths-ignore: ['**.md', 'docs/**']
-  pull_request:
+  pull_request: # every PR, so the required "check" always reports, docs-only PRs included
     branches: [main]
-    paths-ignore: ['**.md', 'docs/**']
   schedule:
     - cron: '17 6 * * 1' # Mondays: catch upstream package changes that break the script
   workflow_dispatch:
