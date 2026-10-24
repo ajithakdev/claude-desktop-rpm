@@ -26,7 +26,7 @@ NO_AUTO_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/claude-desktop-rpm/no-auto-updat
 
 die() { echo "error: $*" >&2; exit 1; }
 log() { echo "==> $*"; }
-notify() { command -v notify-send >/dev/null && notify-send -a Claude -i claude-desktop "$@" 2>/dev/null || true; }
+notify() { command -v notify-send >/dev/null || return 0; notify-send -a Claude -i claude-desktop "$@" 2>/dev/null || true; }
 
 [ "$(id -u)" -ne 0 ] || die "run this as your normal user, not root (cowork asks for sudo itself)"
 
