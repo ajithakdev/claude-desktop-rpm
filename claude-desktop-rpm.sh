@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
 # Install and update Anthropic's official Claude Desktop (Linux beta) on Fedora.
 # Unofficial helper: downloads Anthropic's signed .deb from downloads.claude.ai,
 # verifies it, and unpacks it into ~/.local. No Anthropic files are redistributed.
@@ -286,6 +287,9 @@ timer_on()          { systemctl --user is-active -q "$UNIT.timer"; }
 keyring_running()   { busctl --user status org.freedesktop.secrets; }
 in_kvm_group()      { id -nG "$USER" | grep -qw kvm; }
 has_virtiofsd()     { [ -x /usr/libexec/virtiofsd ] || command -v virtiofsd; }
+# Releases up to 1.1.2 replaced edk2-ovmf's relative link with this absolute one.
+old_ovmf_link()     { [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/edk2/ovmf/OVMF_CODE.fd ]; }
+packaged_ovmf()     { [ -e /usr/share/OVMF/OVMF_CODE.fd ] && ! old_ovmf_link; }
 has_shortcuts_portal() {
   gdbus introspect --session --dest org.freedesktop.portal.Desktop --object-path /org/freedesktop/portal/desktop \
     | grep -q org.freedesktop.portal.GlobalShortcuts
@@ -323,21 +327,22 @@ cmd_doctor() {
   probe "in the kvm group" "not in the kvm group" "$0 cowork, then log out and in" in_kvm_group
   probe "/dev/vhost-vsock" "vhost_vsock not loaded" "$0 cowork" test -e /dev/vhost-vsock
   probe "QEMU" "QEMU missing" "$0 cowork" command -v qemu-system-x86_64
-  probe "UEFI firmware at the path Claude expects" "firmware link missing" "$0 cowork" test -e /usr/share/OVMF/OVMF_CODE.fd
+  probe "UEFI firmware (edk2-ovmf)" "edk2-ovmf firmware missing or its link was changed" "$0 cowork" packaged_ovmf
   probe "virtiofsd" "virtiofsd missing" "$0 cowork" has_virtiofsd
 
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
 }
 
 cmd_cowork() {
-  # Cowork runs tasks in a QEMU/KVM VM. The app looks for firmware only at
-  # Debian's /usr/share/OVMF path, so link Fedora's edk2 files there.
+  # Cowork runs tasks in a QEMU/KVM VM. The app looks for firmware at
+  # /usr/share/OVMF/OVMF_CODE.fd, which Fedora's edk2-ovmf already ships.
   [ -e /dev/kvm ] || die "/dev/kvm missing: enable SVM/VT-x virtualization in your BIOS"
   log "installing QEMU, OVMF firmware and virtiofsd (sudo)"
   sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd
-  sudo mkdir -p /usr/share/OVMF
-  sudo ln -sfn /usr/share/edk2/ovmf/OVMF_CODE.fd /usr/share/OVMF/OVMF_CODE.fd
-  sudo ln -sfn /usr/share/edk2/ovmf/OVMF_VARS.fd /usr/share/OVMF/OVMF_VARS.fd
+  if old_ovmf_link; then
+    log "restoring edk2-ovmf's own firmware links (an older release replaced them)"
+    sudo dnf reinstall -y edk2-ovmf
+  fi
   echo vhost_vsock | sudo tee /etc/modules-load.d/vhost_vsock.conf >/dev/null
   sudo modprobe vhost_vsock
   if ! id -nG "$USER" | grep -qw kvm; then
@@ -355,6 +360,8 @@ cmd_uninstall() {
   [ "$(readlink "$BIN_DIR/ccd" 2>/dev/null)" = "$APP_DIR/resources/bin/ccd" ] && rm -f "$BIN_DIR/ccd"
   find "$SHARE_DIR/icons/hicolor" -name 'claude-desktop.png' -delete 2>/dev/null || true
   update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
+  update-mime-database "$SHARE_DIR/mime" 2>/dev/null || true
+  gtk-update-icon-cache -f -t "$SHARE_DIR/icons/hicolor" 2>/dev/null || true
   log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude are kept)"
 }
 

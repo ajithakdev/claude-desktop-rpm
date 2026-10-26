@@ -12,7 +12,7 @@ The script downloads Claude Desktop only from Anthropic's own repository at `dow
 
 Automatic updates run the same checks. An update downloaded while Claude is open is verified before it is staged, and staged updates live in your own `~/.local`, so only your user can change them.
 
-The app installs into your home directory and runs without root; the script refuses to run as root. Only `cowork` uses sudo: it installs QEMU, edk2-ovmf and virtiofsd with dnf, links the firmware into `/usr/share/OVMF`, writes `/etc/modules-load.d/vhost_vsock.conf`, loads `vhost_vsock` and adds you to the `kvm` group. It is opt-in and never runs on its own.
+The app installs into your home directory and runs without root; the script refuses to run as root. Only `cowork` uses sudo: it installs QEMU, edk2-ovmf and virtiofsd with dnf, writes `/etc/modules-load.d/vhost_vsock.conf`, loads `vhost_vsock` and adds you to the `kvm` group. It is opt-in and never runs on its own.
 
 The daily update timer installs new versions without asking, after the same checks. Turn it off with `claude-desktop-rpm auto-update off`.
 
