@@ -4,9 +4,12 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-10-27
+
+To upgrade, download the new script and run `./claude-desktop-rpm.sh install` once; the daily timer updates the app, not this script. If you ran `cowork` before, run `claude-desktop-rpm cowork` again to put Fedora's firmware links back (`rpm -V edk2-ovmf` then prints nothing).
+
 ### Fixed
 - `cowork` no longer replaces the firmware links in `/usr/share/OVMF`. Fedora's `edk2-ovmf` package already ships them, and the old step made `rpm -V edk2-ovmf` fail. If an older release changed them, `cowork` puts the packaged links back with `dnf reinstall edk2-ovmf`, and `doctor` warns until it does (#8). Found while following the Fedora Magazine writing guidelines during the editors' review.
-
 - `uninstall` now rebuilds the file-type and icon caches, so `.mcpb` and `.skill` files no longer stay registered to Claude after it is removed.
 
 ### Added
@@ -67,7 +70,8 @@ Security release (#7). To upgrade from 1.1.0, download the new script and run `.
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.0.0...v1.1.0
