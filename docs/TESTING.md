@@ -24,6 +24,7 @@ tests/e2e.sh
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
+- [ ] no `sudo` command in the script writes under `/usr`
 - [ ] `uninstall` removes the app, launcher, script copy, menu entry and search provider
 
 CI runs the same script on every push and every Monday.
@@ -41,4 +42,5 @@ CI runs the same script on every push and every Monday.
 - [ ] Quit Claude, run `update`: says up to date, or installs the new version
 - [ ] `update` while Claude is running stops with "quit it first"
 - [ ] `cowork`, log out and in, then a Cowork task starts
+- [ ] after `cowork`, `rpm -V edk2-ovmf` prints nothing and `doctor` shows no firmware warning
 - [ ] `uninstall` removes the menu entry; `~/.config/Claude` is still there

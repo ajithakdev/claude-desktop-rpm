@@ -8,6 +8,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 - Updates arrive by themselves every day. If Claude is open, the update waits and installs the next time you open it.
 - Something wrong? Run `claude-desktop-rpm doctor`. It says what to fix.
 - Cowork needs `claude-desktop-rpm cowork` once, then log out and in.
+- Claude Desktop is Anthropic's proprietary app. Chat works on the Free plan; Claude Code and Cowork need Pro, Max, Team or Enterprise.
 - Releases: push a `vX.Y.Z` tag; the Release workflow tests and publishes it (steps below).
 
 ## Links and what each one is for
@@ -52,7 +53,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 2. **Check setup.** Run `claude-desktop-rpm doctor` and follow any fix it prints.
 3. **Dark mode.** Pick System in Claude's settings. It follows GNOME's style each time Claude starts; after switching styles, quit and reopen Claude.
 4. **Update now.** Quit Claude (tray icon > Quit), then run `claude-desktop-rpm update`. Normally you don't need to: the daily check does it.
-5. **Cowork.** Run `claude-desktop-rpm cowork`, then log out and in.
+5. **Cowork** (paid plans only). Run `claude-desktop-rpm cowork`, then log out and in.
 6. **Remove.** Quit Claude, then run `claude-desktop-rpm uninstall`. Your chats and sign-in stay in `~/.config/Claude`.
 
 ## Admin guide
@@ -87,7 +88,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.config/systemd/user/claude-desktop-rpm-update.{service,timer}` | Daily update check |
 | `~/.config/claude-desktop-rpm/no-auto-update` | Present only after `auto-update off` |
 | `~/.config/Claude/` | Your chats and sign-in (the app's own; uninstall keeps it) |
-| `/usr/share/OVMF/`, `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo) |
+| `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo). It also installs Fedora packages and adds you to the `kvm` group; nothing under `/usr` is changed. |
 
 ## When something goes wrong
 

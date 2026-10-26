@@ -19,6 +19,8 @@ Anthropic ships Claude Desktop for Linux only as a `.deb` for Ubuntu and Debian.
 
 No root for the app, no third-party package repository, and no changes to Anthropic's files.
 
+Claude Desktop is Anthropic's proprietary app, and you need a Claude account to use it. Chat works on every plan, including Free. Claude Code and Cowork need a paid plan (Pro, Max, Team or Enterprise), per Anthropic's [download FAQ](https://claude.com/download) and [plan table](https://support.claude.com/en/articles/10065433-install-claude-desktop). This script is MIT licensed and [not made by Anthropic](#faq), and it doesn't redistribute any of Anthropic's files.
+
 <p align="center">
   <img src="docs/images/claude-desktop-fedora-dark.png" width="820" alt="Claude Desktop running on Fedora 44 GNOME in dark mode" />
 </p>
@@ -53,14 +55,14 @@ Cowork
 All good.
 ```
 
-Want Cowork (Claude's agent mode that runs in a VM)? Run `claude-desktop-rpm cowork` in a terminal, then log out and back in.
+Want Cowork (Claude's agent mode that runs in a VM, paid plans only)? Run `claude-desktop-rpm cowork` in a terminal, then log out and back in.
 
 ## Features
 
 - **Official and verified.** Downloads from `downloads.claude.ai` only. Checks Anthropic's key fingerprint, the signed index, its `Valid-Until` date and both checksums, and stops on any mismatch.
 - **Updates itself.** A daily check installs new versions. If Claude is open, the update waits and goes in the next time you start Claude, with no download at launch.
 - **Dark mode that follows GNOME.** Electron ignores GNOME's dark style, so the System theme stayed light. The launcher fixes that.
-- **Cowork works.** Installs QEMU, OVMF and virtiofsd, and links Fedora's firmware where the app looks for it.
+- **Cowork works.** Installs QEMU, edk2-ovmf and virtiofsd from Fedora's repos and sets up KVM access, the same steps Anthropic lists for Debian. It doesn't touch any packaged file.
 - **GNOME search.** Your Claude sessions show up in the Activities search.
 - **`doctor`** finds what's missing (tray extension, keyring, KVM group, portals) and tells you the exact fix.
 - **No root for the app.** It lives in `~/.local`. Only the opt-in `cowork` command uses sudo, to install Fedora packages and set up KVM.
@@ -76,7 +78,7 @@ There are good projects in this space ([see below](#related-projects)). They mak
 | App files | Unmodified | Some patch the app | Unmodified or patched |
 | Needs root to install | No | Yes | Yes |
 | Updates | Daily, automatic | With `dnf upgrade` | Re-run the build |
-| Fedora fixes (dark mode, Cowork paths) | Yes | Varies | Varies |
+| Fedora fixes (dark mode, Cowork setup) | Yes | Varies | Varies |
 
 Pick this one if you want Anthropic's exact build with no extra signing key in your system.
 
@@ -108,7 +110,7 @@ Every file it writes is listed in [RESOURCES-AND-GUIDE.md](RESOURCES-AND-GUIDE.m
 It only installs what Anthropic signed, and it refuses anything that fails a check. Read the script; it's about 350 lines. See [SECURITY.md](SECURITY.md).
 
 **Is this official?**
-No. The app is Anthropic's official Linux build; the installer is a community project. Anthropic currently supports only Debian and Ubuntu, and [says other distributions are coming](https://code.claude.com/docs/en/desktop-linux).
+No. The app is Anthropic's official Linux build; the installer is a community project, not affiliated with Anthropic. Anthropic currently supports only Debian and Ubuntu, and [says other distributions are coming](https://code.claude.com/docs/en/desktop-linux).
 
 **Why isn't it an `.rpm` file?**
 An RPM would need root to install and a signing key you'd have to trust. Unpacking Anthropic's package into your home folder avoids both. The name says what it's for: RPM-based systems.

@@ -4,6 +4,12 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Fixed
+- `cowork` no longer replaces the firmware links in `/usr/share/OVMF`. Fedora's `edk2-ovmf` package already ships them, and the old step made `rpm -V edk2-ovmf` fail. If an older release changed them, `cowork` puts the packaged links back with `dnf reinstall edk2-ovmf`, and `doctor` warns until it does (#8).
+
+### Changed
+- The README says which Claude plan each feature needs (Chat on Free; Claude Code and Cowork on paid plans) and that Claude Desktop is proprietary software from Anthropic (#9).
+
 ## [1.1.2] - 2026-10-25
 
 ### Fixed
