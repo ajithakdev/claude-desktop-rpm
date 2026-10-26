@@ -62,7 +62,8 @@ check "no cache still registers Claude (file types, icons, menu)" test -z "$trac
 
 echo "== cowork: only Fedora packages, nothing rpm owns is changed"
 dnf -y -q install sudo >/dev/null
-echo "tester ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/tester
+# Skip PAM account and session checks: they fail in rootless podman on Ubuntu hosts (CI).
+printf "Defaults !pam_acct_mgmt, !pam_session\ntester ALL=(ALL) NOPASSWD: ALL\n" > /etc/sudoers.d/tester
 # A container has no KVM or kernel modules: fake the device and stub modprobe (sandbox only).
 touch /dev/kvm
 printf "#!/bin/sh\nexit 0\n" > /usr/local/sbin/modprobe; chmod +x /usr/local/sbin/modprobe
