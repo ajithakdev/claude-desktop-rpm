@@ -175,7 +175,7 @@ Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](h
 
 ## Credits
 
-Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7).
+Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7), and to Fedora Magazine editors Gregory Lee Bartholomew, Richard England and Justin Wheeler, whose [review](https://discussion.fedoraproject.org/t/205949) led to [#8](https://github.com/ajithakdev/claude-desktop-rpm/issues/8) and [#9](https://github.com/ajithakdev/claude-desktop-rpm/issues/9).
 
 ## License
 
