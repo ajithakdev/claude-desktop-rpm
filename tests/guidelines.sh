@@ -40,7 +40,7 @@ check "README links Anthropic's terms and says it is not affiliated" \
 check "README discloses AI help (Credits)" grep -qE 'Written with help from Claude' README.md
 
 echo "== writing style (Magazine writing guidelines)"
-none "no em or en dashes" $'–|—' "${TEXT[@]}"
+none "no em or en dashes" $'\xe2\x80\x93|\xe2\x80\x94' "${TEXT[@]}"
 none "no exclusionary terms (allowlist/denylist, primary/replica)" '\b(black|white)list|\bslave\b|\bmaster (branch|key|node)' "${TEXT[@]}"
 none "US spelling" '\b(colour|behaviour|favourite|organis(e|ed|ing)|recognis(e|ed)|artefact|centre|licence|initialis(e|ed)|customis(e|ed)|optimis(e|ed)|catalogue)s?\b' "${DOCS[@]}" "$SCRIPT"
 none "third-party names styled as their owners do (Copr, NVIDIA, Red Hat, GitHub, GNOME)" '\bCOPR\b|\bNvidia\b|\bRedhat\b|\bRedHat\b|\bGithub\b|\bGnome\b' "${DOCS[@]}"
