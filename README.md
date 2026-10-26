@@ -11,7 +11,7 @@
 [![Fedora 44](https://img.shields.io/badge/Fedora-44-51A2DA?logo=fedora&logoColor=white)](https://fedoraproject.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[Install](#install) · [Features](#features) · [Why this one](#why-this-one) · [FAQ](#faq) · [Contributing](#contributing) · [Guide](RESOURCES-AND-GUIDE.md)
+[Install](#install) · [Features](#features) · [What it changes](#what-it-changes-on-your-system) · [FAQ](#faq) · [Contributing](#contributing) · [Guide](RESOURCES-AND-GUIDE.md)
 
 </div>
 
@@ -68,6 +68,37 @@ Want Cowork (Claude's agent mode that runs in a VM, paid plans only)? Run `claud
 - **No root for the app.** It lives in `~/.local`. Only the opt-in `cowork` command uses sudo, to install Fedora packages and set up KVM.
 - **Clean uninstall.** `claude-desktop-rpm uninstall` removes everything it added and keeps your chats.
 
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `install`, `update` | Install the newest version. Does nothing if you're current. |
+| `update --force` | Reinstall the current version. |
+| `auto-update on`, `off` | Turn the daily update check on or off. No argument shows its state. |
+| `doctor` | Check everything and print fixes. |
+| `cowork` | Set up Cowork (uses sudo). |
+| `version` | Print the installed version. |
+| `uninstall` | Remove the app, launcher, timer and search provider. Chats and sign-in stay. |
+
+## What it changes on your system
+
+| | |
+| --- | --- |
+| Files | Only `~/.local` and `~/.config`. Every path is listed in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches, so nothing still points at Claude. Your chats and sign-in in `~/.config/Claude` stay. |
+| Network | The script only talks to `downloads.claude.ai`. The app itself talks to Anthropic's servers, as it does on every platform. |
+| Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
+| Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. |
+
+## How it works
+
+1. Fetch Anthropic's signing key and check its fingerprint (`31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`).
+2. Verify that `InRelease` is signed by that exact key, and that it hasn't expired.
+3. Check the `Packages` index against `InRelease`, and the `.deb` against `Packages`.
+4. Unpack the `.deb` into `~/.local/lib/claude-desktop` in one atomic swap, and add a launcher, menu entry, icons and the `claude://` sign-in handler.
+5. A systemd user timer repeats this daily. If Claude is open, the verified update is staged and the launcher puts it in place before the next start.
+
+Every file it writes is listed in [RESOURCES-AND-GUIDE.md](RESOURCES-AND-GUIDE.md).
+
 ## Why this one
 
 There are good projects in this space ([see below](#related-projects)). They make different trade-offs:
@@ -82,32 +113,10 @@ There are good projects in this space ([see below](#related-projects)). They mak
 
 Pick this one if you want Anthropic's exact build with no extra signing key in your system.
 
-## Commands
-
-| Command | What it does |
-| --- | --- |
-| `install`, `update` | Install the newest version. Does nothing if you're current. |
-| `update --force` | Reinstall the current version. |
-| `auto-update on`, `off` | Turn the daily update check on or off. No argument shows its state. |
-| `doctor` | Check everything and print fixes. |
-| `cowork` | Set up Cowork (uses sudo). |
-| `version` | Print the installed version. |
-| `uninstall` | Remove the app, launcher, timer and search provider. Chats and sign-in stay. |
-
-## How it works
-
-1. Fetch Anthropic's signing key and check its fingerprint (`31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`).
-2. Verify that `InRelease` is signed by that exact key, and that it hasn't expired.
-3. Check the `Packages` index against `InRelease`, and the `.deb` against `Packages`.
-4. Unpack the `.deb` into `~/.local/lib/claude-desktop` in one atomic swap, and add a launcher, menu entry, icons and the `claude://` sign-in handler.
-5. A systemd user timer repeats this daily. If Claude is open, the verified update is staged and the launcher puts it in place before the next start.
-
-Every file it writes is listed in [RESOURCES-AND-GUIDE.md](RESOURCES-AND-GUIDE.md).
-
 ## FAQ
 
 **Is this safe?**
-It only installs what Anthropic signed, and it refuses anything that fails a check. Read the script; it's about 350 lines. See [SECURITY.md](SECURITY.md).
+It only installs what Anthropic signed, and it refuses anything that fails a check. Read the script; it's under 400 lines. See [SECURITY.md](SECURITY.md).
 
 **Is this official?**
 No. The app is Anthropic's official Linux build; the installer is a community project, not affiliated with Anthropic. Anthropic currently supports only Debian and Ubuntu, and [says other distributions are coming](https://code.claude.com/docs/en/desktop-linux).
@@ -124,6 +133,9 @@ Run `claude-desktop-rpm update --force` once to get the new launcher, then reope
 **Does it work on KDE, RHEL, Rocky or Alma?**
 Probably, but only Fedora 44 GNOME on x86_64 is tested. Reports are welcome.
 
+**Claude says "Hardware acceleration disabled" after a reboot.**
+If Claude is still open when the computer shuts down, its graphics process can fail to restart and Claude counts that as a crash. Turn hardware acceleration back on from Claude's Help menu, then restart Claude. Quitting Claude from the tray before a reboot avoids it.
+
 **What doesn't work?**
 Computer Use and dictation, because Anthropic's Linux build doesn't have them yet on any distribution.
 
@@ -136,6 +148,8 @@ git clone https://github.com/ajithakdev/claude-desktop-rpm && cd claude-desktop-
 shellcheck claude-desktop-rpm.sh tests/*.sh
 tests/mock-repo.sh   # attack tests against a fake repository, offline
 tests/e2e.sh         # installs into a temp folder, never touches your own install
+tests/guidelines.sh  # Fedora packaging, licensing and writing rules, offline
+tests/sandbox.sh     # fresh Fedora 44 container: install, uninstall, cowork (needs podman)
 ```
 
 Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
@@ -147,7 +161,7 @@ Start with [CONTRIBUTING](.github/CONTRIBUTING.md) and the [good first issues](h
 ## Related projects
 
 - [aaddrick/claude-desktop-debian](https://github.com/aaddrick/claude-desktop-debian): repackages Claude Desktop for many distros, with APT and DNF repositories.
-- [dewzor/claude-desktop-fedora](https://github.com/dewzor/claude-desktop-fedora): builds a native RPM from the official package, with COPR auto-updates.
+- [dewzor/claude-desktop-fedora](https://github.com/dewzor/claude-desktop-fedora): builds a native RPM from the official package, with Copr auto-updates.
 - [k3d3/claude-desktop-linux-flake](https://github.com/k3d3/claude-desktop-linux-flake): Nix flake.
 
 ## Star history

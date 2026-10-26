@@ -68,6 +68,8 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Lint | `shellcheck claude-desktop-rpm.sh tests/*.sh` |
 | Attack tests | `tests/mock-repo.sh` (fake repository on 127.0.0.1: tampered signatures, checksums, expiry, downgrade) |
 | Test end to end | `tests/e2e.sh` (installs into a temp folder, never touches `~/.local`) |
+| Fedora rules | `tests/guidelines.sh` (packaging, licensing and Magazine writing rules, offline) |
+| Sandbox test | `tests/sandbox.sh` (fresh Fedora 44 container: install, uninstall, cowork; needs podman) |
 | Manual checklist | [docs/TESTING.md](docs/TESTING.md) |
 | Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z` on main, then `git tag vX.Y.Z && git push origin vX.Y.Z`. The Release workflow reruns every check, then publishes the release with the script, `SHA256SUMS` and that CHANGELOG section as notes |
 | Versions | Patch for fixes (security fixes ship the same day), minor for new commands or features |
@@ -103,6 +105,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Signed out on every launch | Your keyring is missing or locked: `sudo dnf install gnome-keyring` and unlock it |
 | Quick Entry hotkey does nothing on Wayland | Install your desktop's portal backend (`xdg-desktop-portal-gnome` or `-kde`) |
 | `/dev/kvm` missing | Turn on SVM or VT-x in your BIOS |
+| "Hardware acceleration disabled" after a reboot | Claude was open at shutdown. Turn it back on from Claude's Help menu and restart Claude |
 | Cowork fails right after setup | Log out and back in so the `kvm` group applies |
 | "index expired" | Anthropic's index is past its `Valid-Until` date; try again later |
 | Verification fails | The script stops on a wrong key, bad signature or checksum. Don't work around it; open an issue |

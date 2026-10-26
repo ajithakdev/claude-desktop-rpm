@@ -7,7 +7,15 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ### Fixed
 - `cowork` no longer replaces the firmware links in `/usr/share/OVMF`. Fedora's `edk2-ovmf` package already ships them, and the old step made `rpm -V edk2-ovmf` fail. If an older release changed them, `cowork` puts the packaged links back with `dnf reinstall edk2-ovmf`, and `doctor` warns until it does (#8).
 
+- `uninstall` now rebuilds the file-type and icon caches, so `.mcpb` and `.skill` files no longer stay registered to Claude after it is removed.
+
+### Added
+- `tests/guidelines.sh`: checks the script and docs against Fedora's rules (no changes under `/usr`, Fedora packages only, licensing and AI disclosure, Fedora Magazine writing style, working links).
+- `tests/sandbox.sh`: installs, uninstalls and runs `cowork` in a fresh Fedora 44 container as a normal user. CI runs both.
+- The script carries an SPDX license header.
+
 ### Changed
+- The README has a "What it changes on your system" section, and a FAQ entry for the "Hardware acceleration disabled" notice after a reboot.
 - The README says which Claude plan each feature needs (Chat on Free; Claude Code and Cowork on paid plans) and that Claude Desktop is proprietary software from Anthropic (#9).
 
 ## [1.1.2] - 2026-10-25

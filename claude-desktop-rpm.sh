@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
 # Install and update Anthropic's official Claude Desktop (Linux beta) on Fedora.
 # Unofficial helper: downloads Anthropic's signed .deb from downloads.claude.ai,
 # verifies it, and unpacks it into ~/.local. No Anthropic files are redistributed.
@@ -359,6 +360,8 @@ cmd_uninstall() {
   [ "$(readlink "$BIN_DIR/ccd" 2>/dev/null)" = "$APP_DIR/resources/bin/ccd" ] && rm -f "$BIN_DIR/ccd"
   find "$SHARE_DIR/icons/hicolor" -name 'claude-desktop.png' -delete 2>/dev/null || true
   update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
+  update-mime-database "$SHARE_DIR/mime" 2>/dev/null || true
+  gtk-update-icon-cache -f -t "$SHARE_DIR/icons/hicolor" 2>/dev/null || true
   log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude are kept)"
 }
 

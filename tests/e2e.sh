@@ -102,10 +102,6 @@ check "real app back in place" cmp -s "$fake/real" "$app"
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 
-echo "== cowork leaves packaged files alone"
-# cowork needs sudo, so check its source: no sudo command may write under /usr.
-check "no sudo writes under /usr" bash -c "! grep -nE '^\s*sudo .*[ =>]/usr/' '$SCRIPT'"
-
 echo "== uninstall"
 "$SCRIPT" uninstall
 for f in lib/claude-desktop bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \

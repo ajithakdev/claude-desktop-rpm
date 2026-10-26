@@ -21,7 +21,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -33,3 +33,8 @@ jobs:
         run: tests/mock-repo.sh
       - name: End-to-end install from Anthropic into a temp prefix
         run: tests/e2e.sh
+      - name: Fedora packaging, licensing and writing rules
+        run: tests/guidelines.sh
+      # podman ships on the ubuntu runner image.
+      - name: Fresh Fedora 44 container (install, uninstall, cowork)
+        run: tests/sandbox.sh
