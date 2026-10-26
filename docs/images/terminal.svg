@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="602" viewBox="0 0 660 602" role="img" aria-label="Terminal: installing Claude Desktop on Fedora with claude-desktop-rpm, then doctor reports All good">
+<rect width="660" height="602" rx="12" fill="#1d1f23"/>
+<path d="M0 12a12 12 0 0 1 12-12h636a12 12 0 0 1 12 12v22H0z" fill="#2a2d33"/>
+<circle cx="22" cy="17" r="6" fill="#ff5f57"/>
+<circle cx="42" cy="17" r="6" fill="#febc2e"/>
+<circle cx="62" cy="17" r="6" fill="#28c840"/>
+<text x="330.0" y="22" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Cantarell, sans-serif" font-size="13" fill="#9aa1ab">Fedora 44 · Terminal</text>
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="14.5">
+<text x="22" y="56" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>./claude-desktop-rpm.sh install</text>
+<text x="22" y="78" fill="#8b919a">==&gt; checking Anthropic&#x27;s signed repository</text>
+<text x="22" y="100" fill="#8b919a">==&gt; downloading 3.6556.2 (installed: none)</text>
+<text x="22" y="122" fill="#8b919a">==&gt; unpacking</text>
+<text x="22" y="144" fill="#8b919a">==&gt; installed Claude Desktop 3.6556.2 into ~/.local</text>
+<text x="22" y="188" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>claude-desktop-rpm doctor</text>
+<text x="22" y="210" fill="#e6edf3" font-weight="600">Claude Desktop</text>
+<text x="22" y="232" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>installed: 3.6556.2</text>
+<text x="22" y="254" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>launcher (dark mode fix, staged updates)</text>
+<text x="22" y="276" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>auto-update on</text>
+<text x="22" y="298" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>GNOME search provider</text>
+<text x="22" y="320" fill="#e6edf3" font-weight="600">Desktop</text>
+<text x="22" y="342" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>tray icon (AppIndicator extension on)</text>
+<text x="22" y="364" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>keyring (sign-in is saved)</text>
+<text x="22" y="386" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>Quick Entry hotkey (GlobalShortcuts portal)</text>
+<text x="22" y="408" fill="#e6edf3" font-weight="600">Cowork</text>
+<text x="22" y="430" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/kvm</text>
+<text x="22" y="452" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>in the kvm group</text>
+<text x="22" y="474" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/vhost-vsock</text>
+<text x="22" y="496" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>QEMU</text>
+<text x="22" y="518" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>UEFI firmware (edk2-ovmf)</text>
+<text x="22" y="540" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>virtiofsd</text>
+<text x="22" y="562" fill="#7ee787" font-weight="600">All good.</text>
+</g>
+</svg>

@@ -1,0 +1,38 @@
+name: Stats
+
+# Redraws the README stats card once a day. The SVGs live on the `stats` branch,
+# which holds a single commit that each run replaces, so it never grows.
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats
+  cancel-in-progress: true
+
+jobs:
+  card:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Draw the cards
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: mkdir out && python3 .github/scripts/stats.py out
+      - name: Publish to the stats branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd out
+          git init -q -b stats
+          git add stats-light.svg stats-dark.svg
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -q -m "chore: update stats card"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" stats
