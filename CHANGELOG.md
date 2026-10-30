@@ -5,6 +5,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ## [Unreleased]
 
 ### Changed
+- The FAQ no longer lists dictation as missing; it works in Claude Desktop 3.6556.2 on Fedora.
 - README: a Downloads badge is back next to Stars (its total also counts `SHA256SUMS` downloads, a few percent), the nav links Commands, and the intro is tighter.
 - The README is about half as long: each fact appears once, troubleshooting lives in the guide, and a terminal image of a real install and `doctor` run replaces the old screenshot at the top (the screenshot is still there, folded under Install).
 - A daily stats card shows stars over time and script downloads per release, in light and dark.
