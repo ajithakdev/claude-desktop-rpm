@@ -5,6 +5,8 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ## [Unreleased]
 
 ### Changed
+- README: a Support section with Ko-fi and a UPI ID, and a Sponsor button for both.
+- README: a daily release card (version, newest Claude Desktop, tested desktops), a stats card with daily bars for stars and downloads, round profile pictures in Credits, a Follow badge in place of Stars, and a short list of my other projects.
 - KDE Plasma 6.7 is listed as reported working (#2), and the guide has a fix for the app's monospace UI font on KDE.
 - The FAQ no longer lists dictation as missing; it works in Claude Desktop 3.6556.2 on Fedora.
 - README: a Downloads badge is back next to Stars (its total also counts `SHA256SUMS` downloads, a few percent), the nav links Commands, and the intro is tighter.

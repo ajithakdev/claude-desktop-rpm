@@ -8,10 +8,10 @@
 
 [![CI](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml/badge.svg)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
-[![Stars](https://img.shields.io/github/stars/ajithakdev/claude-desktop-rpm?style=flat)](https://github.com/ajithakdev/claude-desktop-rpm/stargazers)
 [![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?label=downloads)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
 [![Fedora 44](https://img.shields.io/badge/Fedora-44-51A2DA?logo=fedora&logoColor=white)](https://fedoraproject.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?label=Follow%20%40ajithakdev&style=social)](https://github.com/ajithakdev)
 
 [Install](#install) · [Commands](#commands) · [What it changes](#what-it-changes-on-your-system) · [Why this one](#why-this-one) · [FAQ](#faq) · [Guide](RESOURCES-AND-GUIDE.md)
 
@@ -62,7 +62,7 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | Network | The script only talks to `downloads.claude.ai`. The app itself talks to Anthropic's servers, as on every platform. |
 | Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
 | Updates | A systemd user timer checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
-| Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. |
+| Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. People have also run it on KDE Plasma and on Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). |
 
 ## Why this one
 
@@ -91,7 +91,18 @@ Computer Use, which Anthropic's Linux build doesn't have yet on any distribution
 **Something looks wrong.**
 Run `claude-desktop-rpm doctor`. The [guide](RESOURCES-AND-GUIDE.md#when-something-goes-wrong) covers the rest, such as the app's "Update available" button, a light System theme, or "Hardware acceleration disabled" after a reboot.
 
-## Stars and downloads
+## Contributing
+
+Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTING](.github/CONTRIBUTING.md) has the setup and the four test scripts, and there are [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
+
+## Releases and downloads
+
+<a href="https://github.com/ajithakdev/claude-desktop-rpm/releases/latest">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/release-dark.svg" />
+    <img alt="Latest release: version, date, the newest Claude Desktop in Anthropic's repository, desktops it was tested on and the checks it runs" src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/release-light.svg" width="660" />
+  </picture>
+</a>
 
 <a href="https://github.com/ajithakdev/claude-desktop-rpm/releases">
   <picture>
@@ -100,15 +111,49 @@ Run `claude-desktop-rpm doctor`. The [guide](RESOURCES-AND-GUIDE.md#when-somethi
   </picture>
 </a>
 
-Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. The card is redrawn daily.
-
-## Contributing
-
-Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTING](.github/CONTRIBUTING.md) has the setup and the four test scripts, and there are [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
+Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. Both cards are redrawn daily.
 
 ## Credits
 
-Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Harald Lapp ([aurora](https://github.com/aurora)) for the first KDE Plasma test report in [#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2), to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7), and to Fedora Magazine editors Gregory Lee Bartholomew, Richard England and Justin Wheeler, whose [review](https://discussion.fedoraproject.org/t/205949) led to [#8](https://github.com/ajithakdev/claude-desktop-rpm/issues/8) and [#9](https://github.com/ajithakdev/claude-desktop-rpm/issues/9).
+Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release.
+
+These people found bugs, tested on other desktops or reviewed the project, and it is better for it. Fedora names link to their [Fedora Discussion](https://discussion.fedoraproject.org) profiles, where the [article review](https://discussion.fedoraproject.org/t/205949) and the [script thread](https://discussion.fedoraproject.org/t/205947) happened.
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="150"><a href="https://github.com/aurora"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-aurora.svg" width="72" height="72" alt="Harald Lapp" /></a><br /><a href="https://github.com/aurora"><sub><b>Harald Lapp</b></sub></a><br /><sub>KDE Plasma test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/2">#2</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/thephatlee"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-thephatlee.svg" width="72" height="72" alt="Marko Jokinen" /></a><br /><a href="https://discussion.fedoraproject.org/u/thephatlee"><sub><b>Marko Jokinen</b></sub></a><br /><sub>Signature check <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/7">#7</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/glb"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-glb.svg" width="72" height="72" alt="Gregory Lee Bartholomew" /></a><br /><a href="https://discussion.fedoraproject.org/u/glb"><sub><b>Gregory Lee Bartholomew</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/rlengland"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-rlengland.svg" width="72" height="72" alt="Richard England" /></a><br /><a href="https://discussion.fedoraproject.org/u/rlengland"><sub><b>Richard England</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/jflory7"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-jflory7.svg" width="72" height="72" alt="Justin Wheeler" /></a><br /><a href="https://discussion.fedoraproject.org/u/jflory7"><sub><b>Justin Wheeler</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
+  </tr>
+</table>
+
+Thanks also to the free services this project runs on: [GitHub](https://github.com) for hosting, CI and releases, [Shields.io](https://shields.io) for the badges, and [Fedora Discussion](https://discussion.fedoraproject.org) for the place to ask.
+
+## More from me
+
+| Project | What it is |
+| --- | --- |
+| [Toolglass](https://toolglass.ajithakdev.com) ([repo](https://github.com/ajithakdev/toolglass)) | 41 free tools that run in your browser: image compressor, screen recorder, JSON, JWT, regex and more. Works offline, no tracking. |
+| [MeterX](https://meterx.ajithakdev.com) ([repo](https://github.com/ajithakdev/meterx)) | A speed test in your browser toolbar: download, upload, ping, jitter and packet loss. |
+| [Minnoli](https://minnoli.ajithakdev.com) | All the Tamil Nadu electricity bills you look after on one screen, sorted by due date, in Tamil and English. |
+| [amazon-pincode-checker](https://github.com/ajithakdev/amazon-pincode-checker) | Checks whether an Amazon.in product delivers to a list of Indian pincodes. |
+| [clip-paste](https://github.com/ajithakdev/clip-paste) | A clipboard manager for the COSMIC desktop that pastes straight into your window. |
+| [CNoBS](https://github.com/ajithakdev/CNoBS) | Learn C in 20-minute chunks: see the output, guess, then break it. |
+
+More at [ajithakdev.com](https://ajithakdev.com).
+
+## Support
+
+The script is free and stays free. If it saved you an evening, a star, a follow on [GitHub](https://github.com/ajithakdev) or a test report from your desktop helps a lot. If you'd like to send a small thank-you:
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="280"><b>From anywhere</b><br /><br /><a href="https://ko-fi.com/ajithakdev"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" /></a><br /><br /><sub>Card or PayPal on <a href="https://ko-fi.com/ajithakdev">ko-fi.com/ajithakdev</a></sub></td>
+    <td align="center" valign="top" width="280"><b>In India, over UPI</b><br /><br /><img src="docs/images/upi-qr.svg" width="120" height="120" alt="UPI QR code for ajithakdev@sbi" /><br /><code>ajithakdev@sbi</code><br /><sub>Scan or paste into GPay, PhonePe or any UPI app</sub></td>
+  </tr>
+</table>
 
 ## License
 
