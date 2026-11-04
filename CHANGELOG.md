@@ -5,6 +5,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ## [Unreleased]
 
 ### Changed
+- KDE Plasma 6.7 is listed as reported working (#2), and the guide has a fix for the app's monospace UI font on KDE.
 - The FAQ no longer lists dictation as missing; it works in Claude Desktop 3.6556.2 on Fedora.
 - README: a Downloads badge is back next to Stars (its total also counts `SHA256SUMS` downloads, a few percent), the nav links Commands, and the intro is tighter.
 - The README is about half as long: each fact appears once, troubleshooting lives in the guide, and a terminal image of a real install and `doctor` run replaces the old screenshot at the top (the screenshot is still there, folded under Install).

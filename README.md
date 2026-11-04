@@ -86,7 +86,7 @@ No. The app is Anthropic's official Linux build; the installer is a community pr
 An RPM would need root to install and a signing key you'd have to trust. Unpacking Anthropic's package into your home folder avoids both. The name says what it's for: RPM-based systems.
 
 **What doesn't work?**
-Computer Use, which Anthropic's Linux build doesn't have yet on any distribution. Dictation works (tested in 3.6556.2, chat and Code tabs). Only Fedora 44 GNOME on x86_64 is tested; KDE, RHEL, Rocky and Alma probably work, and reports are welcome.
+Computer Use, which Anthropic's Linux build doesn't have yet on any distribution. Dictation works (tested in 3.6556.2, chat and Code tabs). Tested on Fedora 44 GNOME (x86_64) and reported working on KDE Plasma 6.7 (Aurora 44, Wayland) in [#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2). RHEL, Rocky and Alma probably work, and reports are welcome.
 
 **Something looks wrong.**
 Run `claude-desktop-rpm doctor`. The [guide](RESOURCES-AND-GUIDE.md#when-something-goes-wrong) covers the rest, such as the app's "Update available" button, a light System theme, or "Hardware acceleration disabled" after a reboot.
@@ -108,7 +108,7 @@ Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTI
 
 ## Credits
 
-Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7), and to Fedora Magazine editors Gregory Lee Bartholomew, Richard England and Justin Wheeler, whose [review](https://discussion.fedoraproject.org/t/205949) led to [#8](https://github.com/ajithakdev/claude-desktop-rpm/issues/8) and [#9](https://github.com/ajithakdev/claude-desktop-rpm/issues/9).
+Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help from Claude, Anthropic's AI assistant, which drafted much of the script, tests and docs; every change is reviewed and tested before release. Thanks to Harald Lapp ([aurora](https://github.com/aurora)) for the first KDE Plasma test report in [#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2), to Marko Jokinen for the signature-check report in [#7](https://github.com/ajithakdev/claude-desktop-rpm/issues/7), and to Fedora Magazine editors Gregory Lee Bartholomew, Richard England and Justin Wheeler, whose [review](https://discussion.fedoraproject.org/t/205949) led to [#8](https://github.com/ajithakdev/claude-desktop-rpm/issues/8) and [#9](https://github.com/ajithakdev/claude-desktop-rpm/issues/9).
 
 ## License
 
