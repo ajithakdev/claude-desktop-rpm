@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- `profile add NAME`, `profile remove NAME` and `profile list`: run a second Claude account side by side, each with its own menu entry and data folder (`~/.config/Claude-NAME`). The launcher passes Chromium's `--user-data-dir`; Anthropic's files are untouched. Browser links go to the profile opened last.
+
 ### Changed
 - README: a Support section with Ko-fi and a UPI ID, and a Sponsor button for both.
 - README: a daily release card (version, newest Claude Desktop, tested desktops), a stats card with daily bars for stars and downloads, round profile pictures in Credits, a Follow badge in place of Stars, and a short list of my other projects.

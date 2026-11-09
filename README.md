@@ -51,6 +51,7 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | `auto-update on`, `off` | Turn the daily update check on or off. No argument shows its state. |
 | `doctor` | Check everything and print fixes. |
 | `cowork` | Set up Cowork (uses sudo). |
+| `profile add NAME`, `remove NAME` | A second account, open side by side: adds "Claude (NAME)" to the app menu with its own sign-in and chats. `profile` alone lists them. |
 | `version` | Print the installed version. |
 | `uninstall` | Remove everything it added. Chats and sign-in stay. |
 
@@ -62,6 +63,7 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | Network | The script only talks to `downloads.claude.ai`. The app itself talks to Anthropic's servers, as on every platform. |
 | Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
 | Updates | A systemd user timer checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
+| Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
 | Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. People have also run it on KDE Plasma and on Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). |
 
 ## Why this one

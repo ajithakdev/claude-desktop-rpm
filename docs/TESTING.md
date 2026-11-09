@@ -44,7 +44,9 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
-- [ ] `uninstall` removes the app, launcher, script copy, menu entry and search provider
+- [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
+- [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
+- [ ] `uninstall` removes the app, launcher, script copy, menu entry, profile entries, the last-profile file and search provider
 
 CI runs the same script on every push and every Monday.
 
@@ -63,4 +65,6 @@ CI runs the same script on every push and every Monday.
 - [ ] `cowork`, log out and in, then a Cowork task starts
 - [ ] after `cowork`, `rpm -V edk2-ovmf` prints nothing and `doctor` shows no firmware warning
 - [ ] `uninstall` removes the menu entry; `~/.config/Claude` is still there
+- [ ] `profile add work`, open "Claude (work)", sign in with a second account: both windows stay open, each keeps its own chats after a restart, and a sign-in started from the browser lands in the right window
+- [ ] with two profiles open, the Quick Entry hotkey still opens one of them and no error or repeated shortcut dialog appears
 - [ ] after `uninstall`, a `.mcpb` file no longer opens with Claude
