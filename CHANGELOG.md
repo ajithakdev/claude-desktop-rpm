@@ -4,6 +4,8 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-10
+
 ### Added
 - `profile add NAME`, `profile remove NAME` and `profile list`: run a second Claude account side by side, each with its own menu entry and data folder (`~/.config/Claude-NAME`). The launcher passes Chromium's `--user-data-dir`; Anthropic's files are untouched. Browser links go to the profile opened last.
 
@@ -82,7 +84,8 @@ Security release (#7). To upgrade from 1.1.0, download the new script and run `.
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.0...v1.1.1
