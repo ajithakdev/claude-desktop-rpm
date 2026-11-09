@@ -19,7 +19,7 @@
 
 Anthropic ships Claude Desktop for Linux only as a `.deb` for Ubuntu and Debian. This Bash script downloads that package from Anthropic, checks its signature and checksums, and installs it into your home folder without root. It also fixes what breaks on Fedora out of the box: dark mode, Cowork, the tray icon, GNOME search and updates.
 
-Claude Desktop is Anthropic's proprietary app. Chat works on every plan, including Free; Claude Code and Cowork need a paid plan (Pro, Max, Team or Enterprise). Details are in Anthropic's [download FAQ](https://claude.com/download) and [plan table](https://support.claude.com/en/articles/10065433-install-claude-desktop). This script is MIT licensed, isn't made by Anthropic, and doesn't redistribute any of its files.
+Claude Desktop is Anthropic's proprietary app. Chat works on every plan, including Free; Claude Code and Cowork need a paid plan (Pro, Max, Ultra, Team or Enterprise). Details are in Anthropic's [download FAQ](https://claude.com/download) and [plan table](https://support.claude.com/en/articles/10065433-install-claude-desktop). This script is MIT licensed, isn't made by Anthropic, and doesn't redistribute any of its files.
 
 <p align="center">
   <img src="docs/images/terminal.svg" width="660" alt="Terminal on Fedora 44: claude-desktop-rpm installs Claude Desktop 3.6556.2 into ~/.local, then doctor reports every check ok and All good" />
