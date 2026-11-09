@@ -8,7 +8,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 - Updates arrive by themselves every day. If Claude is open, the update waits and installs the next time you open it.
 - Something wrong? Run `claude-desktop-rpm doctor`. It says what to fix.
 - Cowork needs `claude-desktop-rpm cowork` once, then log out and in.
-- Claude Desktop is Anthropic's proprietary app. Chat works on the Free plan; Claude Code and Cowork need Pro, Max, Team or Enterprise.
+- Claude Desktop is Anthropic's proprietary app. Chat works on the Free plan; Claude Code and Cowork need Pro, Max, Ultra, Team or Enterprise.
 - Releases: push a `vX.Y.Z` tag; the Release workflow tests and publishes it (steps below).
 
 ## Links and what each one is for
