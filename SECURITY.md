@@ -14,6 +14,8 @@ Automatic updates run the same checks. An update downloaded while Claude is open
 
 The app installs into your home directory and runs without root; the script refuses to run as root. Only `cowork` uses sudo: it installs QEMU, edk2-ovmf and virtiofsd with dnf, writes `/etc/modules-load.d/vhost_vsock.conf`, loads `vhost_vsock` and adds you to the `kvm` group. It is opt-in and never runs on its own.
 
+`self-update` replaces the script itself with the latest GitHub release of this repo. It refuses a file that doesn't match the `SHA256SUMS` published with that release, or that bash can't parse. Both files come from the same release, so the checksum catches a broken or partial download; the trust is the same as your first download of the script (HTTPS from github.com and this repo's account). It only runs when you type it; the timer never updates the script.
+
 The daily update timer installs new versions without asking, after the same checks. Turn it off with `claude-desktop-rpm auto-update off`.
 
 ## Supported versions

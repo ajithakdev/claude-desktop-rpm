@@ -26,8 +26,8 @@ check "every sudo dnf call is install or reinstall from Fedora's repos" \
 check "the app install never runs sudo (only cmd_cowork does)" \
   bash -c '! sed "/^cmd_cowork() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
 check "refuses to run as root" grep -q 'id -u)" -ne 0 ] || die' "$SCRIPT"
-check "only contacts downloads.claude.ai" \
-  bash -c '! grep -oE "https?://[^/\" ]+" "$1" | grep -v "^https://downloads.claude.ai$"' _ "$SCRIPT"
+check "only contacts downloads.claude.ai and this repo's own releases (self-update)" \
+  bash -c '! grep -oE "https?://[^\" ]+" "$1" | grep -vE "^https://downloads\.claude\.ai(/|$)|^https://github\.com/ajithakdev/claude-desktop-rpm/releases/latest/download$"' _ "$SCRIPT"
 
 echo "== licensing and disclosure (Fedora AI policy, editors' requests)"
 check "LICENSE is MIT" grep -q '^MIT License' LICENSE
