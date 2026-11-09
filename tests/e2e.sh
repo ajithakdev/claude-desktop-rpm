@@ -81,7 +81,9 @@ got=$(GTK_THEME=Custom PATH="$fake:$PATH" "$P/bin/claude-desktop")
 check "user GTK_THEME kept (got '$got')" test "$got" = theme=Custom
 
 echo "== profiles"
+printf '#!/bin/sh\n# Written by claude-desktop-rpm.\n' > "$P/bin/claude-desktop" # a launcher from before profiles
 "$SCRIPT" profile add work >/dev/null
+check "profile add upgrades an old launcher" grep -q -- --profile "$P/bin/claude-desktop"
 e=$P/share/applications/com.anthropic.Claude-work.desktop
 check "profile menu entry" grep -q '^Name=Claude (work)$' "$e"
 check "every Exec passes --profile" test "$(grep -c "^Exec=$P/bin/claude-desktop --profile work" "$e")" = "$(grep -c '^Exec=' "$e")"

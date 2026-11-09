@@ -66,4 +66,5 @@ CI runs the same script on every push and every Monday.
 - [ ] after `cowork`, `rpm -V edk2-ovmf` prints nothing and `doctor` shows no firmware warning
 - [ ] `uninstall` removes the menu entry; `~/.config/Claude` is still there
 - [ ] `profile add work`, open "Claude (work)", sign in with a second account: both windows stay open, each keeps its own chats after a restart, and a sign-in started from the browser lands in the right window
+- [ ] with two profiles open, the Quick Entry hotkey still opens one of them and no error or repeated shortcut dialog appears
 - [ ] after `uninstall`, a `.mcpb` file no longer opens with Claude

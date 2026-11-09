@@ -54,7 +54,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 3. **Dark mode.** Pick System in Claude's settings. It follows GNOME's style each time Claude starts; after switching styles, quit and reopen Claude.
 4. **Update now.** Quit Claude (tray icon > Quit), then run `claude-desktop-rpm update`. Normally you don't need to: the daily check does it.
 5. **Cowork** (paid plans only). Run `claude-desktop-rpm cowork`, then log out and in.
-6. **Second account.** Run `claude-desktop-rpm profile add work`, open "Claude (work)" from the app menu and sign in. Both windows can be open at once. Links from the browser go to the profile you opened last. `profile remove work` takes the menu entry away; its chats stay in `~/.config/Claude-work`. Each profile has its own tray icon and they look the same; open the tray menu to see which account it is (it shows the plan).
+6. **Second account.** Run `claude-desktop-rpm profile add work`, open "Claude (work)" from the app menu and sign in. Both windows can be open at once. Links from the browser go to the profile you opened last. `profile remove work` takes the menu entry away; its chats stay in `~/.config/Claude-work`. Each profile has its own tray icon and they look the same; open the tray menu to see which account it is (it shows the plan). Cowork in a profile downloads its own VM image into that profile's folder (about 12 GB).
 7. **Remove.** Quit Claude, then run `claude-desktop-rpm uninstall`. Your chats and sign-in stay in `~/.config/Claude`.
 
 ## Admin guide
