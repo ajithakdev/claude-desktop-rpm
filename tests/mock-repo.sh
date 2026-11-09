@@ -52,7 +52,7 @@ build_repo() {
 
 # pin <fingerprint>: the script with its URLs pointed at the mock and that key pinned.
 pin() {
-  sed -e "s|^REPO=.*|REPO=$URL|" -e "s|^KEY_URL=.*|KEY_URL=$URL/key.asc|" -e "s|^KEY_FPR=.*|KEY_FPR=$1|" \
+  sed -e "s|^REPO=.*|REPO=$URL|" -e "s|^SELF_URL=.*|SELF_URL=$URL/self|" -e "s|^KEY_URL=.*|KEY_URL=$URL/key.asc|" -e "s|^KEY_FPR=.*|KEY_FPR=$1|" \
     "$SCRIPT" > "$S/run.sh"
   chmod +x "$S/run.sh"
 }
@@ -104,6 +104,30 @@ for t in badsig expired novaliduntil packages deb path; do
   build_repo "$S/attacker.asc" 99.0.0 "$t"
   run "tampered $t" refused "$want"
 done
+
+echo "== self-update takes only a release that matches its SHA256SUMS"
+# self_update <what> <updated|refused> <text> <sums line tamper: ok|wrong|missing>
+self_update() {
+  local p; p=$(mktemp -d -p "$S"); mkdir -p "$S/www/self" "$p/bin"
+  printf '#!/usr/bin/env bash\necho new release\n' > "$S/www/self/claude-desktop-rpm.sh"
+  echo old > "$p/bin/claude-desktop-rpm"
+  case $4 in
+    ok) (cd "$S/www/self" && sha256sum claude-desktop-rpm.sh > SHA256SUMS) ;;
+    wrong) printf '%064d  claude-desktop-rpm.sh\n' 0 > "$S/www/self/SHA256SUMS" ;;
+    missing) (cd "$S/www/self" && sha256sum claude-desktop-rpm.sh | sed 's/rpm\.sh$/rpm.sh.bak/' > SHA256SUMS) ;;
+  esac
+  local out got=refused
+  out=$(env -u XDG_CONFIG_HOME CLAUDE_DESKTOP_PREFIX="$p" HOME="$p/home" "$S/run.sh" self-update 2>&1)
+  cmp -s "$S/www/self/claude-desktop-rpm.sh" "$p/bin/claude-desktop-rpm" && got=updated
+  if [ "$got" = "$2" ] && grep -q "$3" <<< "$out"; then
+    echo "  ok: $1 ($got)"; pass=$((pass + 1))
+  else
+    echo "FAIL: $1 ($got, wanted $2 with '$3')" >&2; tail -3 <<< "$out" >&2; failed=$((failed + 1))
+  fi
+}
+self_update "matching checksum installs" updated "updated .*/bin/claude-desktop-rpm" ok
+self_update "wrong checksum refused" refused "script checksum mismatch" wrong
+self_update "checksum line for another file refused" refused "script checksum mismatch" missing
 
 [ "$failed" -eq 0 ] || { echo "FAILED ($failed of $((pass + failed)))" >&2; exit 1; }
 echo "PASS ($pass checks)"

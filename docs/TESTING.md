@@ -16,7 +16,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 
 - [ ] no `sudo` command writes under `/usr`, there are no third-party repos (Copr included), no `rpm -i` from a URL and no `curl | sh`
 - [ ] every `sudo dnf` call installs or reinstalls Fedora packages, and only `cowork` runs sudo
-- [ ] the script refuses root and only contacts `downloads.claude.ai`
+- [ ] the script refuses root and only contacts `downloads.claude.ai`, plus this repo's latest release for `self-update`
 - [ ] the license is MIT with an SPDX header; the README says Claude Desktop is proprietary, which plan each feature needs, links Anthropic's terms, says it isn't affiliated and discloses AI help
 - [ ] the docs have no em or en dashes, no exclusionary terms, US spelling, third-party names styled as their owners do, and sentence-case headings
 - [ ] every relative link and README anchor resolves, CHANGELOG has an Unreleased section, and the README covers every command and needed package
@@ -30,13 +30,14 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] `cowork` installs only packages from Fedora's repos, leaves `rpm -V edk2-ovmf` clean, writes the `vhost_vsock` file and adds the `kvm` group
 - [ ] `cowork` restores `edk2-ovmf`'s links when an older release replaced them
 
-`tests/mock-repo.sh` serves a fake repository on 127.0.0.1 and runs full installs into temporary folders. It checks that each of these is refused: a signature from a second key in `key.asc`, a `key.asc` without Anthropic's key, a bad signature, an expired index, a missing `Valid-Until`, a tampered `Packages`, a tampered `.deb`, an odd package path, and an older version. It also checks that a clean fake repository installs.
+`tests/mock-repo.sh` serves a fake repository on 127.0.0.1 and runs full installs into temporary folders. It checks that each of these is refused: a signature from a second key in `key.asc`, a `key.asc` without Anthropic's key, a bad signature, an expired index, a missing `Valid-Until`, a tampered `Packages`, a tampered `.deb`, an odd package path, and an older version. It also checks that a clean fake repository installs, and that `self-update` installs a script matching its `SHA256SUMS` but refuses a wrong checksum or a checksum line for another file.
 
 `tests/e2e.sh` downloads the real package from Anthropic and installs it into a temporary folder, so it never touches `~/.local`. It checks:
 
 - [ ] the signing key, `InRelease` signature and both checksums pass (any failure stops the install)
 - [ ] Anthropic's real index is accepted; an index signed by a second key in `key.asc`, or by an expired pinned key, is refused; unsigned text after the signature is dropped
 - [ ] `update` refuses to install an older version
+- [ ] `self-update` installs the latest release's script, it matches the published `SHA256SUMS`, and a second run changes nothing
 - [ ] the app, version file, launcher, menu entry, `claude://` handler, icons, search provider and the script's own copy are in place
 - [ ] `update` does nothing when the version is current
 - [ ] `version` prints the installed version

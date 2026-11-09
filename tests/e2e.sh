@@ -128,6 +128,12 @@ check "staged version installed" test "$(cat "$P/lib/claude-desktop/.deb-version
 check "stage cleared" test ! -e "$P/lib/claude-desktop.staged"
 check "real app back in place" cmp -s "$fake/real" "$app"
 
+echo "== self-update from the latest GitHub release"
+check "self-update runs" bash -c "'$SCRIPT' self-update >/dev/null"
+sums=$(curl -fsSL --retry 3 https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/SHA256SUMS)
+check "installed script matches the release checksum" test "$(sha256sum < "$P/bin/claude-desktop-rpm" | cut -d' ' -f1)" = "${sums%% *}"
+check "second run is a no-op" grep -q "already the latest release" <<< "$("$SCRIPT" self-update)"
+
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 

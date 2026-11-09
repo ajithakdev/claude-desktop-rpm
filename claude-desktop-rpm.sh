@@ -8,6 +8,7 @@ set -euo pipefail
 REPO=https://downloads.claude.ai/claude-desktop/apt/stable
 KEY_URL=https://downloads.claude.ai/claude-desktop/key.asc
 KEY_FPR=31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE
+SELF_URL=https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download
 # Never follow a redirect off HTTPS; give up on dead or stalled downloads instead of hanging the timer.
 CURL_OPTS=(--proto-redir '=https' --connect-timeout 20 --speed-limit 1024 --speed-time 60)
 ARCH=amd64
@@ -165,6 +166,22 @@ install_self() {
   local me; me=$(realpath "$0")
   [ "$me" = "$(realpath -m "$SELF")" ] && return
   mkdir -p "$BIN_DIR"; install -m 755 "$me" "$SELF"
+}
+
+# Replace the copy on PATH with the latest release of this script, checked against that release's SHA256SUMS.
+cmd_self_update() {
+  need curl sha256sum awk
+  work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
+  log "downloading the latest claude-desktop-rpm release"
+  curl "${CURL_OPTS[@]}" -fsSL -o "$work/new" "$SELF_URL/claude-desktop-rpm.sh" || die "could not download the script"
+  curl "${CURL_OPTS[@]}" -fsSL -o "$work/SHA256SUMS" "$SELF_URL/SHA256SUMS" || die "could not download SHA256SUMS"
+  local want; want=$(awk '$2 == "claude-desktop-rpm.sh" {print $1; exit}' "$work/SHA256SUMS")
+  if [ -z "$want" ] || [ "$(sha256sum "$work/new" | cut -d' ' -f1)" != "$want" ]; then die "script checksum mismatch"; fi
+  bash -n "$work/new" || die "the downloaded script does not parse"
+  if cmp -s "$work/new" "$SELF"; then log "claude-desktop-rpm is already the latest release"; return; fi
+  # mv, not a copy over the file: a running copy keeps reading its old inode.
+  mkdir -p "$BIN_DIR"; install -m 755 "$work/new" "$SELF.new"; mv -f "$SELF.new" "$SELF"
+  log "updated $SELF to the latest release"
 }
 
 # $1: "" or --force or --auto (the timer: stage the update if Claude is open).
@@ -429,6 +446,7 @@ case "${1:-}" in
   cowork)         cmd_cowork ;;
   profile)        cmd_profile "${2:-}" "${3:-}" ;;
   uninstall)      cmd_uninstall ;;
+  self-update)    cmd_self_update ;;
   version)        echo "installed: $(installed_version)" ;;
-  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|profile [add|remove NAME]|uninstall|version}"; exit 1 ;;
+  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|profile [add|remove NAME]|self-update|uninstall|version}"; exit 1 ;;
 esac

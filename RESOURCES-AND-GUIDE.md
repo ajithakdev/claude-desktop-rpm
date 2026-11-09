@@ -63,6 +63,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | --- | --- |
 | Install dependencies | `sudo dnf install curl gnupg2 binutils tar` |
 | Force reinstall | `claude-desktop-rpm update --force` |
+| Update the script itself | `claude-desktop-rpm self-update` (the daily timer only updates the app) |
 | Auto-update on, off, state | `claude-desktop-rpm auto-update on`, `off`, or no argument |
 | See the next update check | `systemctl --user list-timers claude-desktop-rpm-update.timer` |
 | Update log | `journalctl --user -u claude-desktop-rpm-update` |

@@ -52,6 +52,7 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | `doctor` | Check everything and print fixes. |
 | `cowork` | Set up Cowork (uses sudo). |
 | `profile add NAME`, `remove NAME` | A second account, open side by side: adds "Claude (NAME)" to the app menu with its own sign-in and chats. `profile` alone lists them. |
+| `self-update` | Replace the script with the latest release, after checking it against that release's `SHA256SUMS`. The daily timer updates the app, not the script. |
 | `version` | Print the installed version. |
 | `uninstall` | Remove everything it added. Chats and sign-in stay. |
 
@@ -60,7 +61,7 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | Area | What happens |
 | --- | --- |
 | Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
-| Network | The script only talks to `downloads.claude.ai`. The app itself talks to Anthropic's servers, as on every platform. |
+| Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. The app itself talks to Anthropic's servers, as on every platform. |
 | Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
 | Updates | A systemd user timer checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
 | Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
