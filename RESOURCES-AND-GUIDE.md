@@ -54,7 +54,8 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 3. **Dark mode.** Pick System in Claude's settings. It follows GNOME's style each time Claude starts; after switching styles, quit and reopen Claude.
 4. **Update now.** Quit Claude (tray icon > Quit), then run `claude-desktop-rpm update`. Normally you don't need to: the daily check does it.
 5. **Cowork** (paid plans only). Run `claude-desktop-rpm cowork`, then log out and in.
-6. **Remove.** Quit Claude, then run `claude-desktop-rpm uninstall`. Your chats and sign-in stay in `~/.config/Claude`.
+6. **Second account.** Run `claude-desktop-rpm profile add work`, open "Claude (work)" from the app menu and sign in. Both windows can be open at once. Links from the browser go to the profile you opened last. `profile remove work` takes the menu entry away; its chats stay in `~/.config/Claude-work`. Each profile has its own tray icon and they look the same; open the tray menu to see which account it is (it shows the plan).
+7. **Remove.** Quit Claude, then run `claude-desktop-rpm uninstall`. Your chats and sign-in stay in `~/.config/Claude`.
 
 ## Admin guide
 
@@ -80,7 +81,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | --- | --- |
 | `~/.local/lib/claude-desktop/` | The app, unmodified |
 | `~/.local/lib/claude-desktop.staged/` | An update waiting for the next launch (only while one waits) |
-| `~/.local/bin/claude-desktop` | Launcher: dark mode, staged updates |
+| `~/.local/bin/claude-desktop` | Launcher: dark mode, staged updates, `--profile NAME` |
 | `~/.local/bin/claude-desktop-rpm` | This script |
 | `~/.local/bin/ccd` | Anthropic's `ccd` helper, linked from the app |
 | `~/.local/share/applications/com.anthropic.Claude.desktop` | Menu entry and `claude://` handler (sign-in needs it) |
@@ -88,6 +89,9 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.local/share/icons/hicolor/*/apps/claude-desktop.png` | Icons |
 | `~/.local/share/gnome-shell/search-providers/`, `~/.local/share/dbus-1/services/` | GNOME search provider |
 | `~/.config/systemd/user/claude-desktop-rpm-update.{service,timer}` | Daily update check |
+| `~/.local/share/applications/com.anthropic.Claude-NAME.desktop` | One menu entry per profile (`profile add NAME`) |
+| `~/.config/claude-desktop-rpm/last-profile` | The profile opened last, so `claude://` links reach it |
+| `~/.config/Claude-NAME/` | A profile's chats and sign-in (uninstall keeps it) |
 | `~/.config/claude-desktop-rpm/no-auto-update` | Present only after `auto-update off` |
 | `~/.config/Claude/` | Your chats and sign-in (the app's own; uninstall keeps it) |
 | `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo). It also installs Fedora packages and adds you to the `kvm` group; nothing under `/usr` is changed. |

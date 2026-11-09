@@ -7,6 +7,7 @@ SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/claude-desktop-rpm.sh"
 export CLAUDE_DESKTOP_PREFIX
 CLAUDE_DESKTOP_PREFIX=$(mktemp -d)
 P=$CLAUDE_DESKTOP_PREFIX
+export XDG_CONFIG_HOME=$P/.config # profiles and the last-profile file stay in the temp prefix
 running=
 trap 'if [ -n "$running" ]; then kill "$running" 2>/dev/null || true; fi; rm -rf "$P"' EXIT
 
@@ -78,6 +79,32 @@ for scheme in prefer-dark default; do
 done
 got=$(GTK_THEME=Custom PATH="$fake:$PATH" "$P/bin/claude-desktop")
 check "user GTK_THEME kept (got '$got')" test "$got" = theme=Custom
+
+echo "== profiles"
+"$SCRIPT" profile add work >/dev/null
+e=$P/share/applications/com.anthropic.Claude-work.desktop
+check "profile menu entry" grep -q '^Name=Claude (work)$' "$e"
+check "every Exec passes --profile" test "$(grep -c "^Exec=$P/bin/claude-desktop --profile work" "$e")" = "$(grep -c '^Exec=' "$e")"
+check "default entry keeps the claude:// handler" bash -c "! grep -q MimeType '$e'"
+check "profile list" test "$("$SCRIPT" profile list)" = work
+check "bad profile name rejected" bash -c "! '$SCRIPT' profile add ../x 2>/dev/null"
+check "remove of a missing profile fails" bash -c "! '$SCRIPT' profile remove nope 2>/dev/null"
+# shellcheck disable=SC2016 # the stub expands $* when it runs
+printf '#!/bin/sh\necho "args=$*"\n' > "$P/lib/claude-desktop/claude-desktop"
+dir=$XDG_CONFIG_HOME/Claude-work
+check "launcher gives the profile its own data folder" test "$("$P/bin/claude-desktop" --profile work)" = "args=--user-data-dir=$dir"
+check "launcher rejects a bad profile name" bash -c "! '$P/bin/claude-desktop' --profile ../x 2>/dev/null"
+check "link goes to default while the profile is closed" test "$("$P/bin/claude-desktop" claude://x)" = "args=claude://x"
+bash -c "exec -a '$fake/app --user-data-dir=$dir' sleep 120" & running=$!
+for _ in $(seq 50); do pgrep -f -- "Claude-work 120" >/dev/null && break; sleep 0.1; done
+check "link goes to the open profile" test "$("$P/bin/claude-desktop" claude://x)" = "args=--user-data-dir=$dir claude://x"
+check "remove refuses while the profile is open" bash -c "! '$SCRIPT' profile remove work 2>/dev/null"
+"$P/bin/claude-desktop" >/dev/null
+check "plain launch makes links go to default again" test "$("$P/bin/claude-desktop" claude://x)" = "args=claude://x"
+kill "$running"; wait "$running" 2>/dev/null || true; running=
+"$SCRIPT" profile remove work >/dev/null
+check "profile removed" test ! -e "$e"
+"$SCRIPT" profile add home >/dev/null # left for uninstall to remove
 mv "$fake/real" "$P/lib/claude-desktop/claude-desktop"
 
 echo "== update while Claude is open is staged, then applied at launch"
@@ -105,6 +132,7 @@ check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 echo "== uninstall"
 "$SCRIPT" uninstall
 for f in lib/claude-desktop bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \
+  share/applications/com.anthropic.Claude-home.desktop .config/claude-desktop-rpm/last-profile \
   share/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini share/dbus-1/services/com.anthropic.Claude.SearchProvider.service; do
   check "removed $f" test ! -e "$P/$f"
 done

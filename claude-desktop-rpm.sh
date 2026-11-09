@@ -23,9 +23,11 @@ DESKTOP_FILE="$SHARE_DIR/applications/com.anthropic.Claude.desktop"
 SEARCH_INI="$SHARE_DIR/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini"
 SEARCH_SERVICE="$SHARE_DIR/dbus-1/services/com.anthropic.Claude.SearchProvider.service"
 VERSION_FILE="$APP_DIR/.deb-version"
-UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+UNIT_DIR="$CONFIG_HOME/systemd/user"
 UNIT=claude-desktop-rpm-update
-NO_AUTO_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/claude-desktop-rpm/no-auto-update"
+NO_AUTO_FILE="$CONFIG_HOME/claude-desktop-rpm/no-auto-update"
+LAST_PROFILE="$CONFIG_HOME/claude-desktop-rpm/last-profile"
 
 die() { echo "error: $*" >&2; exit 1; }
 log() { echo "==> $*"; }
@@ -105,6 +107,21 @@ if [ -d "$STAGE_DIR" ] && [ -x "$SELF" ]; then CLAUDE_DESKTOP_PREFIX="$PREFIX" "
 if [ -z "\${GTK_THEME:-}" ] && gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null | grep -q dark; then
   export GTK_THEME=Adwaita:dark
 fi
+# --profile NAME gives Claude its own data folder, so a second account can be open alongside.
+# claude:// links (from the browser or the menu) go to the profile opened last, while it is open.
+profile=
+if [ "\${1:-}" = --profile ]; then
+  profile=\${2:-}; shift; [ \$# -gt 0 ] && shift
+  case "\$profile" in ''|*[!a-z0-9-]*) echo "claude-desktop: profile names use a-z, 0-9 and -" >&2; exit 2 ;; esac
+  mkdir -p "${LAST_PROFILE%/*}" && echo "\$profile" > "$LAST_PROFILE"
+elif [ \$# -eq 0 ]; then
+  rm -f "$LAST_PROFILE"
+elif read -r last 2>/dev/null < "$LAST_PROFILE"; then
+  case "\$last" in ''|*[!a-z0-9-]*) ;; *)
+    pgrep -f -- "--user-data-dir=$CONFIG_HOME/Claude-\$last( |\\\$)" >/dev/null && profile=\$last ;;
+  esac
+fi
+[ -n "\$profile" ] && set -- --user-data-dir="$CONFIG_HOME/Claude-\$profile" "\$@"
 exec "$APP_DIR/claude-desktop" "\$@"
 LAUNCHER
   chmod +x "$BIN_DIR/claude-desktop"
@@ -352,17 +369,53 @@ cmd_cowork() {
   log "Cowork prerequisites ready; restart Claude Desktop"
 }
 
+profile_entry() { echo "$SHARE_DIR/applications/com.anthropic.Claude-$1.desktop"; }
+profile_running() { pgrep -f -- "--user-data-dir=$CONFIG_HOME/Claude-$1( |\$)" >/dev/null; }
+
+# A profile is a menu entry that starts Claude with its own data folder (sign-in, chats, settings).
+cmd_profile() {
+  local action=${1:-list} name=${2:-} entry
+  if [ "$action" = add ] || [ "$action" = remove ]; then
+    case "$name" in ''|*[!a-z0-9-]*) die "usage: $0 profile $action NAME (a-z, 0-9 and -, such as work)" ;; esac
+    entry=$(profile_entry "$name")
+  fi
+  case "$action" in
+    add)
+      [ -f "$DESKTOP_FILE" ] || die "Claude Desktop is not installed; run: $0 install"
+      grep -q -- --profile "$BIN_DIR/claude-desktop" || write_launcher # launchers before 1.2.0 drop --profile
+      # The default entry keeps the claude:// handler; the launcher passes links on to the open profile.
+      sed -e "s|^Name=Claude\$|Name=Claude ($name)|" -e "s|^Exec=$BIN_DIR/claude-desktop|& --profile $name|" \
+        -e '/^MimeType=/d' "$DESKTOP_FILE" > "$entry"
+      update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
+      log "added profile $name: open \"Claude ($name)\" from the app menu and sign in"
+      echo "    its data lives in $CONFIG_HOME/Claude-$name" ;;
+    remove)
+      [ -f "$entry" ] || die "no profile named $name"
+      profile_running "$name" && die "Claude ($name) is running; quit it first (tray icon > Quit), then re-run"
+      rm -f "$entry"
+      update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
+      log "removed profile $name from the menu; its sign-in and chats stay in $CONFIG_HOME/Claude-$name (delete that folder to erase them)" ;;
+    list)
+      local f n
+      for f in "$SHARE_DIR"/applications/com.anthropic.Claude-*.desktop; do
+        [ -e "$f" ] || continue
+        n=${f##*/com.anthropic.Claude-}; echo "${n%.desktop}"
+      done ;;
+    *) die "usage: $0 profile {add NAME|remove NAME|list}" ;;
+  esac
+}
+
 cmd_uninstall() {
   app_running && die "Claude Desktop is running; quit it first (tray icon > Quit), then re-run"
   [ "$PREFIX" = "$HOME/.local" ] && disable_timer
   rm -rf "$APP_DIR" "$STAGE_DIR" "$DESKTOP_FILE" "$SHARE_DIR/mime/packages/com.anthropic.Claude.xml" "$SEARCH_INI" "$SEARCH_SERVICE"
-  rm -f "$BIN_DIR/claude-desktop" "$SELF"
+  rm -f "$BIN_DIR/claude-desktop" "$SELF" "$SHARE_DIR"/applications/com.anthropic.Claude-*.desktop "$LAST_PROFILE"
   [ "$(readlink "$BIN_DIR/ccd" 2>/dev/null)" = "$APP_DIR/resources/bin/ccd" ] && rm -f "$BIN_DIR/ccd"
   find "$SHARE_DIR/icons/hicolor" -name 'claude-desktop.png' -delete 2>/dev/null || true
   update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
   update-mime-database "$SHARE_DIR/mime" 2>/dev/null || true
   gtk-update-icon-cache -f -t "$SHARE_DIR/icons/hicolor" 2>/dev/null || true
-  log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude are kept)"
+  log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude and any Claude-<profile> folders are kept)"
 }
 
 # Sourced (by tests): define functions only.
@@ -374,7 +427,8 @@ case "${1:-}" in
   auto-update)    cmd_auto_update "${2:-}" ;;
   doctor)         cmd_doctor ;;
   cowork)         cmd_cowork ;;
+  profile)        cmd_profile "${2:-}" "${3:-}" ;;
   uninstall)      cmd_uninstall ;;
   version)        echo "installed: $(installed_version)" ;;
-  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|uninstall|version}"; exit 1 ;;
+  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|profile [add|remove NAME]|uninstall|version}"; exit 1 ;;
 esac
