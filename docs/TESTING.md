@@ -42,12 +42,13 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] `update` does nothing when the version is current
 - [ ] `version` prints the installed version
 - [ ] the launcher sets `GTK_THEME=Adwaita:dark` when GNOME's style is dark, leaves it unset when light, and keeps a `GTK_THEME` you set yourself
+- [ ] the launcher puts its `xdg-open` first on Claude's PATH, and that `xdg-open` opens links without `CHROME_DESKTOP`
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
 - [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
 - [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
-- [ ] `uninstall` removes the app, launcher, script copy, menu entry, profile entries, the last-profile file and search provider
+- [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider
 
 CI runs the same script on every push and every Monday.
 

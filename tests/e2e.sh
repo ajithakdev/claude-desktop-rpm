@@ -80,6 +80,16 @@ done
 got=$(GTK_THEME=Custom PATH="$fake:$PATH" "$P/bin/claude-desktop")
 check "user GTK_THEME kept (got '$got')" test "$got" = theme=Custom
 
+echo "== links Claude opens drop CHROME_DESKTOP"
+# Claude runs xdg-open from its PATH; ours must come first and hand off without CHROME_DESKTOP.
+# shellcheck disable=SC2016 # the stubs expand their variables when they run
+printf '#!/bin/sh\ncommand -v xdg-open\n' > "$P/lib/claude-desktop/claude-desktop"
+check "launcher puts the shim first on PATH" test "$("$P/bin/claude-desktop")" = "$P/lib/claude-desktop-rpm/xdg-open"
+# shellcheck disable=SC2016
+printf '#!/bin/sh\necho "open=$* desktop=${CHROME_DESKTOP:-}"\n' > "$fake/xdg-open"; chmod +x "$fake/xdg-open"
+got=$(CHROME_DESKTOP=com.anthropic.Claude.desktop PATH="$P/lib/claude-desktop-rpm:$fake:$PATH" "$P/lib/claude-desktop-rpm/xdg-open" https://x)
+check "shim opens the link without CHROME_DESKTOP (got '$got')" test "$got" = "open=https://x desktop="
+
 echo "== profiles"
 printf '#!/bin/sh\n# Written by claude-desktop-rpm.\n' > "$P/bin/claude-desktop" # a launcher from before profiles
 "$SCRIPT" profile add work >/dev/null
@@ -139,7 +149,7 @@ check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 
 echo "== uninstall"
 "$SCRIPT" uninstall
-for f in lib/claude-desktop bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \
+for f in lib/claude-desktop lib/claude-desktop-rpm bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \
   share/applications/com.anthropic.Claude-home.desktop .config/claude-desktop-rpm/last-profile \
   share/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini share/dbus-1/services/com.anthropic.Claude.SearchProvider.service; do
   check "removed $f" test ! -e "$P/$f"

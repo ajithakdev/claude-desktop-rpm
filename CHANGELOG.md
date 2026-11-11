@@ -7,6 +7,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 ### Added
 - `self-update`: replaces the script with the latest release after checking it against that release's `SHA256SUMS`. Until now, getting new commands such as `profile` meant downloading the script again by hand.
 
+### Fixed
+- A browser opened from a link in Claude (for example the update notice) showed up as Claude: its windows sat under Claude's dock icon, and its "make default browser" button made Claude your default browser. Electron passes its `CHROME_DESKTOP` to every program it opens, so the launcher now opens links through a small `xdg-open` that drops it. If this already happened to you, set your browser as default again in Settings > Apps > Default Apps.
+
 ## [1.2.0] - 2026-11-10
 
 ### Added

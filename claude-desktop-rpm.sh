@@ -29,6 +29,7 @@ UNIT_DIR="$CONFIG_HOME/systemd/user"
 UNIT=claude-desktop-rpm-update
 NO_AUTO_FILE="$CONFIG_HOME/claude-desktop-rpm/no-auto-update"
 LAST_PROFILE="$CONFIG_HOME/claude-desktop-rpm/last-profile"
+SHIM_DIR="$PREFIX/lib/claude-desktop-rpm"
 
 die() { echo "error: $*" >&2; exit 1; }
 log() { echo "==> $*"; }
@@ -97,6 +98,18 @@ latest_package() {
 }
 
 write_launcher() {
+  # Electron sets CHROME_DESKTOP=com.anthropic.Claude.desktop and every program Claude opens
+  # inherits it. A Chromium started that way (a link Claude opens) takes Claude's app id, so its
+  # windows sit under Claude's dock icon, and "make default browser" makes Claude the default.
+  mkdir -p "$SHIM_DIR"
+  cat > "$SHIM_DIR/xdg-open" <<SHIM
+#!/bin/sh
+# Written by claude-desktop-rpm. Opens links from Claude without Claude's CHROME_DESKTOP.
+unset CHROME_DESKTOP
+PATH=\${PATH#"$SHIM_DIR:"}
+exec xdg-open "\$@"
+SHIM
+  chmod +x "$SHIM_DIR/xdg-open"
   rm -f "$BIN_DIR/claude-desktop" # new inode, so a launcher that is running right now is not rewritten under it
   cat > "$BIN_DIR/claude-desktop" <<LAUNCHER
 #!/bin/sh
@@ -122,6 +135,8 @@ elif read -r last 2>/dev/null < "$LAST_PROFILE"; then
     pgrep -f -- "--user-data-dir=$CONFIG_HOME/Claude-\$last( |\\\$)" >/dev/null && profile=\$last ;;
   esac
 fi
+# Links Claude opens go through the xdg-open above, so the browser does not pose as Claude.
+export PATH="$SHIM_DIR:\$PATH"
 [ -n "\$profile" ] && set -- --user-data-dir="$CONFIG_HOME/Claude-\$profile" "\$@"
 exec "$APP_DIR/claude-desktop" "\$@"
 LAUNCHER
@@ -425,7 +440,7 @@ cmd_profile() {
 cmd_uninstall() {
   app_running && die "Claude Desktop is running; quit it first (tray icon > Quit), then re-run"
   [ "$PREFIX" = "$HOME/.local" ] && disable_timer
-  rm -rf "$APP_DIR" "$STAGE_DIR" "$DESKTOP_FILE" "$SHARE_DIR/mime/packages/com.anthropic.Claude.xml" "$SEARCH_INI" "$SEARCH_SERVICE"
+  rm -rf "$APP_DIR" "$STAGE_DIR" "$SHIM_DIR" "$DESKTOP_FILE" "$SHARE_DIR/mime/packages/com.anthropic.Claude.xml" "$SEARCH_INI" "$SEARCH_SERVICE"
   rm -f "$BIN_DIR/claude-desktop" "$SELF" "$SHARE_DIR"/applications/com.anthropic.Claude-*.desktop "$LAST_PROFILE"
   [ "$(readlink "$BIN_DIR/ccd" 2>/dev/null)" = "$APP_DIR/resources/bin/ccd" ] && rm -f "$BIN_DIR/ccd"
   find "$SHARE_DIR/icons/hicolor" -name 'claude-desktop.png' -delete 2>/dev/null || true
