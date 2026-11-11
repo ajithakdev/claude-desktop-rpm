@@ -8,6 +8,7 @@ export CLAUDE_DESKTOP_PREFIX
 CLAUDE_DESKTOP_PREFIX=$(mktemp -d)
 P=$CLAUDE_DESKTOP_PREFIX
 export XDG_CONFIG_HOME=$P/.config # profiles and the last-profile file stay in the temp prefix
+export XDG_CURRENT_DESKTOP=test # launcher flags for GNOME are checked on their own below
 running=
 trap 'if [ -n "$running" ]; then kill "$running" 2>/dev/null || true; fi; rm -rf "$P"' EXIT
 
@@ -106,6 +107,8 @@ printf '#!/bin/sh\necho "args=$*"\n' > "$P/lib/claude-desktop/claude-desktop"
 dir=$XDG_CONFIG_HOME/Claude-work
 check "launcher gives the profile its own data folder" test "$("$P/bin/claude-desktop" --profile work)" = "args=--user-data-dir=$dir"
 check "launcher rejects a bad profile name" bash -c "! '$P/bin/claude-desktop' --profile ../x 2>/dev/null"
+check "GNOME skips the Quick Entry shortcut prompt" test "$(XDG_CURRENT_DESKTOP=ubuntu:GNOME "$P/bin/claude-desktop" x)" = "args=--disable-features=GlobalShortcutsPortal x"
+check "other desktops keep it" test "$(XDG_CURRENT_DESKTOP=KDE "$P/bin/claude-desktop" x)" = "args=x"
 check "link goes to default while the profile is closed" test "$("$P/bin/claude-desktop" claude://x)" = "args=claude://x"
 bash -c "exec -a '$fake/app --user-data-dir=$dir' sleep 120" & running=$!
 for _ in $(seq 50); do pgrep -f -- "Claude-work 120" >/dev/null && break; sleep 0.1; done

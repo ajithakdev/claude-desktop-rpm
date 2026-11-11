@@ -9,6 +9,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ### Fixed
 - A browser opened from a link in Claude (for example the update notice) showed up as Claude: its windows sat under Claude's dock icon, and its "make default browser" button made Claude your default browser. Electron passes its `CHROME_DESKTOP` to every program it opens, so the launcher now opens links through a small `xdg-open` that drops it. If this already happened to you, set your browser as default again in Settings > Apps > Default Apps.
+- GNOME no longer shows an "Add Keyboard Shortcuts" prompt for Ctrl+Alt+Space every time Claude (or a second profile) starts. The launcher skips the app's request for that shortcut on GNOME, where it never fired anyway.
 
 ## [1.2.0] - 2026-11-10
 

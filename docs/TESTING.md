@@ -42,6 +42,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] `update` does nothing when the version is current
 - [ ] `version` prints the installed version
 - [ ] the launcher sets `GTK_THEME=Adwaita:dark` when GNOME's style is dark, leaves it unset when light, and keeps a `GTK_THEME` you set yourself
+- [ ] the launcher adds `--disable-features=GlobalShortcutsPortal` on GNOME only
 - [ ] the launcher puts its `xdg-open` first on Claude's PATH, and that `xdg-open` opens links without `CHROME_DESKTOP`
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
@@ -56,6 +57,7 @@ CI runs the same script on every push and every Monday.
 
 - [ ] `./claude-desktop-rpm.sh install` finishes, and Claude shows up in the app menu
 - [ ] Sign-in in the browser comes back to the app (tests the `claude://` handler)
+- [ ] On GNOME, starting Claude (and a second profile) shows no "Add Keyboard Shortcuts" prompt
 - [ ] With the browser fully closed, open a link from Claude (for example the update notice). The browser gets its own dock icon, not Claude's, and Settings > Apps > Default Apps still shows your browser. Test it cold: a browser that is already open keeps its own environment, which is how this bug got past us (`CHROME_DESKTOP` leaked from Claude into the browser it started)
 - [ ] Settings > Appearance > System: dark when GNOME's style is Dark, light when Light (quit and reopen Claude after switching)
 - [ ] Light and Dark buttons still work

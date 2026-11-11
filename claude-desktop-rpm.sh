@@ -137,6 +137,10 @@ elif read -r last 2>/dev/null < "$LAST_PROFILE"; then
 fi
 # Links Claude opens go through the xdg-open above, so the browser does not pose as Claude.
 export PATH="$SHIM_DIR:\$PATH"
+# The app asks GNOME for its Quick Entry shortcut (Ctrl+Alt+Space) on every start, and GNOME
+# shows an "Add Keyboard Shortcuts" prompt that comes back for each profile. The shortcut never
+# fires on GNOME Wayland (anthropics/claude-code#89160), so skip the request there.
+case "\${XDG_CURRENT_DESKTOP:-}" in *GNOME*) set -- --disable-features=GlobalShortcutsPortal "\$@" ;; esac
 [ -n "\$profile" ] && set -- --user-data-dir="$CONFIG_HOME/Claude-\$profile" "\$@"
 exec "$APP_DIR/claude-desktop" "\$@"
 LAUNCHER
