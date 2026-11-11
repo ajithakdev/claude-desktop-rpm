@@ -83,6 +83,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.local/lib/claude-desktop/` | The app, unmodified |
 | `~/.local/lib/claude-desktop.staged/` | An update waiting for the next launch (only while one waits) |
 | `~/.local/bin/claude-desktop` | Launcher: dark mode, staged updates, `--profile NAME` |
+| `~/.local/lib/claude-desktop-rpm/xdg-open` | Opens links from Claude without Claude's `CHROME_DESKTOP`, so the browser keeps its own dock icon |
 | `~/.local/bin/claude-desktop-rpm` | This script |
 | `~/.local/bin/ccd` | Anthropic's `ccd` helper, linked from the app |
 | `~/.local/share/applications/com.anthropic.Claude.desktop` | Menu entry and `claude://` handler (sign-in needs it) |
@@ -105,6 +106,8 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
 | "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
 | Ctrl+Alt+Space (Quick Entry) does nothing on GNOME Wayland | A bug in the app itself ([anthropics/claude-code#89160](https://github.com/anthropics/claude-code/issues/89160)), with or without profiles. Use the tray icon > Open Quick Entry instead |
+| Browser windows show under Claude's dock icon, or Claude became your default browser | Happened before the `xdg-open` fix when Claude started the browser for a link. Quit the browser, run `claude-desktop-rpm update --force` once for the new launcher, then set your browser again in Settings > Apps > Default Apps |
+| GNOME keeps asking to "Add Keyboard Shortcuts" (Ctrl+Alt+Space) | That prompt comes from the app itself (Quick Entry asks GNOME for a global shortcut), not from this script. Click Add once. Two profiles open at once share one app id in GNOME, so each one asks again; the shortcut does nothing on GNOME Wayland anyway (row above) |
 | No tray icon on GNOME | `gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com`. If that says it doesn't exist, first `sudo dnf install gnome-shell-extension-appindicator` (in a real terminal) and log out and in |
 | System theme stays light | Run `claude-desktop-rpm update --force` once to get the new launcher, then reopen Claude |
 | App says "Update available" | Its link points to apt. Ignore it, or quit Claude and run `claude-desktop-rpm update` |

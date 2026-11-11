@@ -56,6 +56,7 @@ CI runs the same script on every push and every Monday.
 
 - [ ] `./claude-desktop-rpm.sh install` finishes, and Claude shows up in the app menu
 - [ ] Sign-in in the browser comes back to the app (tests the `claude://` handler)
+- [ ] With the browser fully closed, open a link from Claude (for example the update notice). The browser gets its own dock icon, not Claude's, and Settings > Apps > Default Apps still shows your browser. Test it cold: a browser that is already open keeps its own environment, which is how this bug got past us (`CHROME_DESKTOP` leaked from Claude into the browser it started)
 - [ ] Settings > Appearance > System: dark when GNOME's style is Dark, light when Light (quit and reopen Claude after switching)
 - [ ] Light and Dark buttons still work
 - [ ] `claude-desktop-rpm doctor` shows no warnings you didn't expect
