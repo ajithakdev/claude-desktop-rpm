@@ -125,8 +125,10 @@ mv "$fake/real" "$P/lib/claude-desktop/claude-desktop"
 echo "== update while Claude is open is staged, then applied at launch"
 app=$P/lib/claude-desktop/claude-desktop
 mv "$app" "$fake/real"
-cp "$(command -v sleep)" "$app" # a process whose command line starts with the app path
-"$app" 120 & running=$!
+printf '#!/bin/sh\n' > "$app"
+# A process whose command line starts with the app path. Not a copy of sleep: on runners where
+# sleep is a multicall coreutils binary, a renamed copy exits with "unknown program".
+bash -c "exec -a '$app' sleep 120" & running=$!
 echo 0.0.1 > "$P/lib/claude-desktop/.deb-version"
 check "update refuses while open" bash -c "! '$SCRIPT' update >/dev/null 2>&1"
 "$SCRIPT" update --auto >/dev/null
