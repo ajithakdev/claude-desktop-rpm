@@ -14,7 +14,7 @@ jobs:
 
   publish:
     needs: checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04 # pinned: bump by PR, so a new image cannot break main unseen
     timeout-minutes: 5
     permissions:
       contents: write # create the GitHub release

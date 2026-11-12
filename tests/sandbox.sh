@@ -38,11 +38,11 @@ check "doctor runs" bash -c "runuser -u tester -- env HOME=/home/tester /home/te
 echo "== every file written is one RESOURCES-AND-GUIDE.md lists"
 new=$(comm -13 <(echo "$before") <(snap))
 # Documented locations, from the "Files it writes" table.
-allowed="^\.local/lib/claude-desktop/|^\.local/bin/(claude-desktop|claude-desktop-rpm|ccd)$|^\.local/share/applications/com\.anthropic\.Claude\.desktop$|^\.local/share/applications/mimeinfo\.cache$|^\.local/share/mime/|^\.local/share/icons/hicolor/|^\.local/share/gnome-shell/search-providers/com\.anthropic\.Claude\.search-provider\.ini$|^\.local/share/dbus-1/services/com\.anthropic\.Claude\.SearchProvider\.service$|^\.config/systemd/user/claude-desktop-rpm-update\.|^\.config/claude-desktop-rpm/"
+allowed="^\.local/lib/claude-desktop/|^\.local/bin/(claude-desktop|claude-desktop-rpm|ccd)$|^\.local/share/applications/com\.anthropic\.Claude\.desktop$|^\.local/share/applications/mimeinfo\.cache$|^\.local/share/mime/|^\.local/share/icons/hicolor/|^\.local/share/gnome-shell/search-providers/com\.anthropic\.Claude\.search-provider\.ini$|^\.local/share/dbus-1/services/com\.anthropic\.Claude\.SearchProvider\.service$|^\.config/systemd/user/claude-desktop-rpm-update\.|^\.local/lib/claude-desktop-rpm/xdg-open$|^\.config/claude-desktop-rpm/"
 stray=$(echo "$new" | grep -vE "$allowed" || true)
 [ -z "$stray" ] || echo "$stray" | sed "s/^/        not documented: /" >&2
 check "no undocumented files ($(echo "$new" | wc -l) written)" test -z "$stray"
-for p in .local/lib/claude-desktop/ .local/bin/claude-desktop .local/bin/claude-desktop-rpm .local/share/applications/com.anthropic.Claude.desktop .local/share/mime/packages/com.anthropic.Claude.xml .local/share/gnome-shell/search-providers/ .local/share/dbus-1/services/; do
+for p in .local/lib/claude-desktop/ .local/lib/claude-desktop-rpm/xdg-open .local/bin/claude-desktop .local/bin/claude-desktop-rpm .local/share/applications/com.anthropic.Claude.desktop .local/share/mime/packages/com.anthropic.Claude.xml .local/share/gnome-shell/search-providers/ .local/share/dbus-1/services/; do
   check "guide lists ~/$p" grep -qF "~/$p" /src/RESOURCES-AND-GUIDE.md
 done
 
