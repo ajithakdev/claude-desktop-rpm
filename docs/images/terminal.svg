@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="660" height="602" viewBox="0 0 660 602" role="img" aria-label="Terminal: installing Claude Desktop on Fedora with claude-desktop-rpm, then doctor reports All good">
+<style>.l{animation-duration:16s;animation-iteration-count:infinite;animation-timing-function:linear}.l1{animation-name:k1}@keyframes k1{0%,1.88%{opacity:0}2.81%,94%{opacity:1}100%{opacity:0}}.l2{animation-name:k2}@keyframes k2{0%,3.88%{opacity:0}4.81%,94%{opacity:1}100%{opacity:0}}.l3{animation-name:k3}@keyframes k3{0%,5.88%{opacity:0}6.81%,94%{opacity:1}100%{opacity:0}}.l4{animation-name:k4}@keyframes k4{0%,7.88%{opacity:0}8.81%,94%{opacity:1}100%{opacity:0}}.l5{animation-name:k5}@keyframes k5{0%,9.88%{opacity:0}10.81%,94%{opacity:1}100%{opacity:0}}.l6{animation-name:k6}@keyframes k6{0%,15.62%{opacity:0}16.56%,94%{opacity:1}100%{opacity:0}}.l7{animation-name:k7}@keyframes k7{0%,17.62%{opacity:0}18.56%,94%{opacity:1}100%{opacity:0}}.l8{animation-name:k8}@keyframes k8{0%,19.62%{opacity:0}20.56%,94%{opacity:1}100%{opacity:0}}.l9{animation-name:k9}@keyframes k9{0%,21.62%{opacity:0}22.56%,94%{opacity:1}100%{opacity:0}}.l10{animation-name:k10}@keyframes k10{0%,23.62%{opacity:0}24.56%,94%{opacity:1}100%{opacity:0}}.l11{animation-name:k11}@keyframes k11{0%,25.62%{opacity:0}26.56%,94%{opacity:1}100%{opacity:0}}.l12{animation-name:k12}@keyframes k12{0%,27.62%{opacity:0}28.56%,94%{opacity:1}100%{opacity:0}}.l13{animation-name:k13}@keyframes k13{0%,29.62%{opacity:0}30.56%,94%{opacity:1}100%{opacity:0}}.l14{animation-name:k14}@keyframes k14{0%,31.62%{opacity:0}32.56%,94%{opacity:1}100%{opacity:0}}.l15{animation-name:k15}@keyframes k15{0%,33.62%{opacity:0}34.56%,94%{opacity:1}100%{opacity:0}}.l16{animation-name:k16}@keyframes k16{0%,35.62%{opacity:0}36.56%,94%{opacity:1}100%{opacity:0}}.l17{animation-name:k17}@keyframes k17{0%,37.62%{opacity:0}38.56%,94%{opacity:1}100%{opacity:0}}.l18{animation-name:k18}@keyframes k18{0%,39.62%{opacity:0}40.56%,94%{opacity:1}100%{opacity:0}}.l19{animation-name:k19}@keyframes k19{0%,41.62%{opacity:0}42.56%,94%{opacity:1}100%{opacity:0}}.l20{animation-name:k20}@keyframes k20{0%,43.62%{opacity:0}44.56%,94%{opacity:1}100%{opacity:0}}.l21{animation-name:k21}@keyframes k21{0%,45.62%{opacity:0}46.56%,94%{opacity:1}100%{opacity:0}}.l22{animation-name:k22}@keyframes k22{0%,47.62%{opacity:0}48.56%,94%{opacity:1}100%{opacity:0}}.l23{animation-name:k23}@keyframes k23{0%,49.62%{opacity:0}50.56%,94%{opacity:1}100%{opacity:0}}@media (prefers-reduced-motion: reduce){.l{animation:none}}</style>
 <rect width="660" height="602" rx="12" fill="#1d1f23"/>
 <path d="M0 12a12 12 0 0 1 12-12h636a12 12 0 0 1 12 12v22H0z" fill="#2a2d33"/>
 <circle cx="22" cy="17" r="6" fill="#ff5f57"/>
@@ -6,28 +7,28 @@
 <circle cx="62" cy="17" r="6" fill="#28c840"/>
 <text x="330.0" y="22" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Cantarell, sans-serif" font-size="13" fill="#9aa1ab">Fedora 44 · Terminal</text>
 <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="14.5">
-<text x="22" y="56" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>./claude-desktop-rpm.sh install</text>
-<text x="22" y="78" fill="#8b919a">==&gt; checking Anthropic&#x27;s signed repository</text>
-<text x="22" y="100" fill="#8b919a">==&gt; downloading 3.6556.2 (installed: none)</text>
-<text x="22" y="122" fill="#8b919a">==&gt; unpacking</text>
-<text x="22" y="144" fill="#8b919a">==&gt; installed Claude Desktop 3.6556.2 into ~/.local</text>
-<text x="22" y="188" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>claude-desktop-rpm doctor</text>
-<text x="22" y="210" fill="#e6edf3" font-weight="600">Claude Desktop</text>
-<text x="22" y="232" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>installed: 3.6556.2</text>
-<text x="22" y="254" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>launcher (dark mode fix, staged updates)</text>
-<text x="22" y="276" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>auto-update on</text>
-<text x="22" y="298" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>GNOME search provider</text>
-<text x="22" y="320" fill="#e6edf3" font-weight="600">Desktop</text>
-<text x="22" y="342" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>tray icon (AppIndicator extension on)</text>
-<text x="22" y="364" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>keyring (sign-in is saved)</text>
-<text x="22" y="386" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>Quick Entry hotkey (GlobalShortcuts portal)</text>
-<text x="22" y="408" fill="#e6edf3" font-weight="600">Cowork</text>
-<text x="22" y="430" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/kvm</text>
-<text x="22" y="452" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>in the kvm group</text>
-<text x="22" y="474" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/vhost-vsock</text>
-<text x="22" y="496" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>QEMU</text>
-<text x="22" y="518" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>UEFI firmware (edk2-ovmf)</text>
-<text x="22" y="540" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>virtiofsd</text>
-<text x="22" y="562" fill="#7ee787" font-weight="600">All good.</text>
+<text class="l l1" x="22" y="56" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>./claude-desktop-rpm.sh install</text>
+<text class="l l2" x="22" y="78" fill="#8b919a">==&gt; checking Anthropic&#x27;s signed repository</text>
+<text class="l l3" x="22" y="100" fill="#8b919a">==&gt; downloading 3.6556.2 (installed: none)</text>
+<text class="l l4" x="22" y="122" fill="#8b919a">==&gt; unpacking</text>
+<text class="l l5" x="22" y="144" fill="#8b919a">==&gt; installed Claude Desktop 3.6556.2 into ~/.local</text>
+<text class="l l6" x="22" y="188" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>claude-desktop-rpm doctor</text>
+<text class="l l7" x="22" y="210" fill="#e6edf3" font-weight="600">Claude Desktop</text>
+<text class="l l8" x="22" y="232" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>installed: 3.6556.2</text>
+<text class="l l9" x="22" y="254" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>launcher (dark mode fix, staged updates)</text>
+<text class="l l10" x="22" y="276" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>auto-update on</text>
+<text class="l l11" x="22" y="298" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>GNOME search provider</text>
+<text class="l l12" x="22" y="320" fill="#e6edf3" font-weight="600">Desktop</text>
+<text class="l l13" x="22" y="342" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>tray icon (AppIndicator extension on)</text>
+<text class="l l14" x="22" y="364" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>keyring (sign-in is saved)</text>
+<text class="l l15" x="22" y="386" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>Quick Entry hotkey (GlobalShortcuts portal)</text>
+<text class="l l16" x="22" y="408" fill="#e6edf3" font-weight="600">Cowork</text>
+<text class="l l17" x="22" y="430" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/kvm</text>
+<text class="l l18" x="22" y="452" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>in the kvm group</text>
+<text class="l l19" x="22" y="474" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/vhost-vsock</text>
+<text class="l l20" x="22" y="496" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>QEMU</text>
+<text class="l l21" x="22" y="518" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>UEFI firmware (edk2-ovmf)</text>
+<text class="l l22" x="22" y="540" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>virtiofsd</text>
+<text class="l l23" x="22" y="562" fill="#7ee787" font-weight="600">All good.</text>
 </g>
 </svg>

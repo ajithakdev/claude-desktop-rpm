@@ -1,33 +1,38 @@
 <div align="center">
 
-<img src="docs/images/icon.png" width="88" alt="" />
+<img src="docs/images/hero.svg" width="100%" alt="claude-desktop-rpm: Anthropic's official Claude Desktop on Fedora. Signature verified, no root, updates daily." />
 
-# claude-desktop-rpm
+<br />
 
-**Anthropic's official Claude Desktop on Fedora: verified, unmodified, and kept up to date.**
+<a href="https://fedoramagazine.org/installing-the-official-claude-desktop-linux-beta-on-fedora-linux/"><img src="docs/images/featured-fedora-magazine.svg" height="44" alt="Featured in Fedora Magazine" /></a>
 
-[![CI](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml/badge.svg)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?label=downloads)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
-[![Fedora 44](https://img.shields.io/badge/Fedora-44-51A2DA?logo=fedora&logoColor=white)](https://fedoraproject.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+<br /><br />
+
+[![CI](https://img.shields.io/github/actions/workflow/status/ajithakdev/claude-desktop-rpm/ci.yml?style=for-the-badge&label=tests&logo=githubactions&logoColor=white)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm?style=for-the-badge&color=D97757)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?style=for-the-badge&label=downloads&color=3fb950)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
+[![Fedora 44](https://img.shields.io/badge/Fedora-44-51A2DA?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-8b949e?style=for-the-badge)](LICENSE)
 [![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?label=Follow%20%40ajithakdev&style=social)](https://github.com/ajithakdev)
 
-[Install](#install) · [Features](#features) · [Commands](#commands) · [What it changes](#what-it-changes-on-your-system) · [How it works](#how-it-works) · [FAQ](#faq) · [Guide](RESOURCES-AND-GUIDE.md)
-
-📰 **Featured in Fedora Magazine:** [Installing the official Claude Desktop Linux beta on Fedora Linux](https://fedoramagazine.org/installing-the-official-claude-desktop-linux-beta-on-fedora-linux/)
+**[Install](#install)** · **[Features](#features)** · **[Commands](#commands)** · **[What it changes](#what-it-changes-on-your-system)** · **[How it works](#how-it-works)** · **[FAQ](#faq)** · **[Guide](RESOURCES-AND-GUIDE.md)**
 
 </div>
 
+<br />
+
 Anthropic ships Claude Desktop for Linux only as a `.deb` for Ubuntu and Debian. This Bash script downloads that package from Anthropic, checks its signature and checksums, and installs it into your home folder without root. It also fixes what breaks on Fedora out of the box: dark mode, Cowork, the tray icon, GNOME search and updates.
 
-Claude Desktop is Anthropic's proprietary app. Chat works on every plan, including Free; Claude Code and Cowork need a paid plan (Pro, Max, Ultra, Team or Enterprise). Details are in Anthropic's [download FAQ](https://claude.com/download) and [plan table](https://support.claude.com/en/articles/10065433-install-claude-desktop). This script is MIT licensed, isn't made by Anthropic, and doesn't redistribute any of its files.
+> [!NOTE]
+> Claude Desktop is Anthropic's proprietary app. Chat works on every plan, including Free; Claude Code and Cowork need a paid plan (Pro, Max, Ultra, Team or Enterprise). Details are in Anthropic's [download FAQ](https://claude.com/download) and [plan table](https://support.claude.com/en/articles/10065433-install-claude-desktop). This script is MIT licensed, isn't made by Anthropic, and doesn't redistribute any of its files.
 
 <p align="center">
   <img src="docs/images/terminal.svg" width="660" alt="Terminal on Fedora 44: claude-desktop-rpm installs Claude Desktop 3.6556.2 into ~/.local, then doctor reports every check ok and All good" />
 </p>
 
 ## Install
+
+Three lines, about a minute:
 
 ```bash
 sudo dnf install curl gnupg2 binutils tar
@@ -38,7 +43,7 @@ chmod +x claude-desktop-rpm.sh && ./claude-desktop-rpm.sh install
 Open **Claude** from the app menu and sign in. If anything looks off, `claude-desktop-rpm doctor` checks the setup and prints the fix. For Cowork, run `claude-desktop-rpm cowork` once, then log out and back in.
 
 <details>
-<summary>Screenshot</summary>
+<summary><b>See it running</b> (Fedora 44 GNOME, dark mode)</summary>
 
 <p align="center"><img src="docs/images/claude-desktop-fedora-dark.png" width="820" alt="Claude Desktop running on Fedora 44 GNOME in dark mode" /></p>
 
@@ -46,13 +51,24 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 
 ## Features
 
-- **Anthropic's own build, checked first.** The signing key fingerprint, the signed repository index and every checksum must match before anything is unpacked.
-- **No root to install.** Everything goes into `~/.local` and `~/.config`, and `uninstall` takes it all back out.
-- **Fedora fixes in the launcher, not the app.** Dark mode, the tray icon, GNOME search and the app menu work out of the box, and Anthropic's files stay byte for byte as shipped.
-- **Daily updates.** A systemd user timer installs new versions; if Claude is open, the update waits until you next start it.
-- **Cowork in one command.** `cowork` installs QEMU, OVMF and virtiofsd from Fedora's repos and sets up `vhost_vsock` and the `kvm` group.
-- **Two accounts side by side.** `profile add work` adds a "Claude (work)" menu entry with its own sign-in and chats.
-- **`doctor` when something's off.** It checks the setup and prints the exact fix.
+<table>
+  <tr>
+    <td width="50%" valign="top">🔐 <b>Anthropic's own build, checked first</b><br /><sub>The signing key fingerprint, the signed repository index and every checksum must match before anything is unpacked.</sub></td>
+    <td width="50%" valign="top">🏠 <b>No root to install</b><br /><sub>Everything goes into <code>~/.local</code> and <code>~/.config</code>, and <code>uninstall</code> takes it all back out.</sub></td>
+  </tr>
+  <tr>
+    <td valign="top">🎩 <b>Fedora fixes in the launcher, not the app</b><br /><sub>Dark mode, the tray icon, GNOME search and the app menu work out of the box. Anthropic's files stay byte for byte as shipped.</sub></td>
+    <td valign="top">🔄 <b>Daily updates</b><br /><sub>A systemd user timer installs new versions. If Claude is open, the update waits until you next start it.</sub></td>
+  </tr>
+  <tr>
+    <td valign="top">🖥️ <b>Cowork in one command</b><br /><sub><code>cowork</code> installs QEMU, OVMF and virtiofsd from Fedora's repos and sets up <code>vhost_vsock</code> and the <code>kvm</code> group.</sub></td>
+    <td valign="top">👥 <b>Two accounts side by side</b><br /><sub><code>profile add work</code> adds a "Claude (work)" menu entry with its own sign-in and chats.</sub></td>
+  </tr>
+  <tr>
+    <td valign="top">🩺 <b><code>doctor</code> when something's off</b><br /><sub>It checks the app, the desktop and Cowork, and prints the exact fix.</sub></td>
+    <td valign="top">🧪 <b>Tested like it matters</b><br /><sub>Every pull request runs ShellCheck, tampered-repository attacks, a real install and a fresh Fedora 44 container from install to uninstall.</sub></td>
+  </tr>
+</table>
 
 ## Commands
 
@@ -72,14 +88,23 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 
 | Area | What happens |
 | --- | --- |
-| Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
-| Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. The app itself talks to Anthropic's servers, as on every platform. |
-| Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
-| Updates | A systemd user timer checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
-| Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
-| Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. People have also run it on KDE Plasma and on Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). |
+| 📁 Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
+| 🌐 Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. The app itself talks to Anthropic's servers, as on every platform. |
+| 🔑 Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
+| 🔄 Updates | A systemd user timer checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
+| 👥 Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
+| 🧪 Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. People have also run it on KDE Plasma and on Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). |
 
 ## How it works
+
+```mermaid
+flowchart LR
+    A["Anthropic's repo<br/>downloads.claude.ai"] --> B{"Key, signature<br/>and checksums ok?"}
+    B -- no --> X["Stop"]
+    B -- yes --> D["Unpack into<br/>~/.local"]
+    D --> E["Launcher with<br/>Fedora fixes"]
+    E -. daily timer .-> A
+```
 
 1. The script downloads Anthropic's APT repository index (`InRelease`) and signing key from `downloads.claude.ai`.
 2. It checks the key's fingerprint, that the index is signed by that key and hasn't expired, then the checksum of the package list and of the `.deb`. Any mismatch stops the install ([SECURITY.md](SECURITY.md) has the details).
@@ -91,30 +116,42 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 
 | | claude-desktop-rpm | Third-party dnf repos | Build-your-own RPM scripts |
 | --- | --- | --- | --- |
-| Who you trust | Anthropic only | Anthropic and the repo owner's key | Anthropic and the build script |
-| App files | Unmodified | Some patch the app | Unmodified or patched |
-| Needs root to install | No | Yes | Yes |
-| Updates | Daily, automatic | With `dnf upgrade` | Re-run the build |
+| Who you trust | ✅ Anthropic only | ⚠️ Anthropic and the repo owner's key | ⚠️ Anthropic and the build script |
+| App files | ✅ Unmodified | ⚠️ Some patch the app | ➖ Unmodified or patched |
+| Needs root to install | ✅ No | ❌ Yes | ❌ Yes |
+| Updates | ✅ Daily, automatic | ✅ With `dnf upgrade` | ❌ Re-run the build |
 
 Pick this one if you want Anthropic's exact build with no extra signing key on your system. Other good options: [claude-desktop-debian](https://github.com/aaddrick/claude-desktop-debian) (APT and DNF repos), [claude-desktop-fedora](https://github.com/dewzor/claude-desktop-fedora) (native RPM with Copr updates) and [claude-desktop-linux-flake](https://github.com/k3d3/claude-desktop-linux-flake) (Nix).
 
 ## FAQ
 
-**Is this official?**
-No. The app is Anthropic's official Linux build; the installer is a community project, not affiliated with Anthropic. Anthropic supports only Debian and Ubuntu for now and [says other distributions are coming](https://code.claude.com/docs/en/desktop-linux).
+<details>
+<summary><b>Is this official?</b></summary>
+<br />
+No. The app is Anthropic's official Linux build; the installer is a community project, not affiliated with Anthropic. Anthropic supports only Debian and Ubuntu for now and <a href="https://code.claude.com/docs/en/desktop-linux">says other distributions are coming</a>.
+</details>
 
-**Why isn't it an `.rpm` file?**
+<details>
+<summary><b>Why isn't it an <code>.rpm</code> file?</b></summary>
+<br />
 An RPM would need root to install and a signing key you'd have to trust. Unpacking Anthropic's package into your home folder avoids both. The name says what it's for: RPM-based systems.
+</details>
 
-**What doesn't work?**
-Computer Use, which Anthropic's Linux build doesn't have yet on any distribution. Dictation works (tested in 3.6556.2, chat and Code tabs). Tested on Fedora 44 GNOME (x86_64) and reported working on KDE Plasma 6.7 (Aurora 44, Wayland) in [#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2). RHEL, Rocky and Alma probably work, and reports are welcome.
+<details>
+<summary><b>What doesn't work?</b></summary>
+<br />
+Computer Use, which Anthropic's Linux build doesn't have yet on any distribution. Dictation works (tested in 3.6556.2, chat and Code tabs). Tested on Fedora 44 GNOME (x86_64) and reported working on KDE Plasma 6.7 (Aurora 44, Wayland) in <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/2">#2</a>. RHEL, Rocky and Alma probably work, and reports are welcome.
+</details>
 
-**Something looks wrong.**
-Run `claude-desktop-rpm doctor`. The [guide](RESOURCES-AND-GUIDE.md#when-something-goes-wrong) covers the rest, such as the app's "Update available" button, a light System theme, or "Hardware acceleration disabled" after a reboot.
+<details>
+<summary><b>Something looks wrong.</b></summary>
+<br />
+Run <code>claude-desktop-rpm doctor</code>. The <a href="RESOURCES-AND-GUIDE.md#when-something-goes-wrong">guide</a> covers the rest, such as the app's "Update available" button, a light System theme, or "Hardware acceleration disabled" after a reboot.
+</details>
 
 ## Contributing
 
-Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTING](.github/CONTRIBUTING.md) has the setup and the four test scripts, and there are [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
+Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTING](.github/CONTRIBUTING.md) has the setup and the four test scripts, and there are [good first issues](https://github.com/ajithakdev/claude-desktop-rpm/labels/good%20first%20issue): test it on your desktop ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)) or add tab completion ([#16](https://github.com/ajithakdev/claude-desktop-rpm/issues/16)). Questions go to [Discussions](https://github.com/ajithakdev/claude-desktop-rpm/discussions).
 
 ## Releases and downloads
 
