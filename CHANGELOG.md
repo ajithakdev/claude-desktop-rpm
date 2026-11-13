@@ -4,11 +4,13 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
-### Changed
-- README rewrite: an animated banner, a Featured in Fedora Magazine badge, a full-width terminal image with real install and doctor output from Claude Desktop 5.11492.2, line icons in place of emoji, a step-by-step account of the verification, a How it works flowchart and the release and stats cards side by side. Animations stop when the system asks for reduced motion.
+## [1.3.0] - 2026-11-14
 
 ### Added
 - `self-update`: replaces the script with the latest release after checking it against that release's `SHA256SUMS`. Until now, getting new commands such as `profile` meant downloading the script again by hand.
+
+### Changed
+- Rewrote the README. It links the Fedora Magazine article, shows real install and `doctor` output, and lists the verification steps in the order the script runs them.
 
 ### Fixed
 - A browser opened from a link in Claude (for example the update notice) showed up as Claude: its windows sat under Claude's dock icon, and its "make default browser" button made Claude your default browser. Electron passes its `CHROME_DESKTOP` to every program it opens, so the launcher now opens links through a small `xdg-open` that drops it. If this already happened to you, set your browser as default again in Settings > Apps > Default Apps.
@@ -94,7 +96,8 @@ Security release (#7). To upgrade from 1.1.0, download the new script and run `.
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.1...v1.1.2
