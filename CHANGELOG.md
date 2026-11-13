@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Changed
+- README rewrite: an animated banner, a Featured in Fedora Magazine badge, a full-width terminal image with real install and doctor output from Claude Desktop 5.11492.2, line icons in place of emoji, a step-by-step account of the verification, a How it works flowchart and the release and stats cards side by side. Animations stop when the system asks for reduced motion.
+
 ### Added
 - `self-update`: replaces the script with the latest release after checking it against that release's `SHA256SUMS`. Until now, getting new commands such as `profile` meant downloading the script again by hand.
 

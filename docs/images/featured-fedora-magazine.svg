@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="372" height="48" viewBox="0 0 372 48" role="img" aria-label="Featured in Fedora Magazine">
+<defs>
+  <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#3c6eb4"/><stop offset="1" stop-color="#51A2DA"/></linearGradient>
+  <clipPath id="c"><rect width="372" height="48" rx="10"/></clipPath>
+</defs>
+<g clip-path="url(#c)">
+  <rect width="372" height="48" fill="#161b22"/>
+  <rect x="150" width="222" height="48" fill="url(#g)"/>
+</g>
+<g font-family="system-ui, -apple-system, 'Segoe UI', Cantarell, sans-serif">
+  <text x="22" y="30" font-size="13" font-weight="700" fill="#c9d1d9" letter-spacing="2">FEATURED IN</text>
+  <text x="261" y="31" font-size="19" font-weight="800" fill="#ffffff" text-anchor="middle">Fedora Magazine</text>
+</g>
+</svg>

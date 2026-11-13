@@ -1,33 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="660" height="602" viewBox="0 0 660 602" role="img" aria-label="Terminal: installing Claude Desktop on Fedora with claude-desktop-rpm, then doctor reports All good">
-<rect width="660" height="602" rx="12" fill="#1d1f23"/>
-<path d="M0 12a12 12 0 0 1 12-12h636a12 12 0 0 1 12 12v22H0z" fill="#2a2d33"/>
-<circle cx="22" cy="17" r="6" fill="#ff5f57"/>
-<circle cx="42" cy="17" r="6" fill="#febc2e"/>
-<circle cx="62" cy="17" r="6" fill="#28c840"/>
-<text x="330.0" y="22" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Cantarell, sans-serif" font-size="13" fill="#9aa1ab">Fedora 44 · Terminal</text>
-<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="14.5">
-<text x="22" y="56" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>./claude-desktop-rpm.sh install</text>
-<text x="22" y="78" fill="#8b919a">==&gt; checking Anthropic&#x27;s signed repository</text>
-<text x="22" y="100" fill="#8b919a">==&gt; downloading 3.6556.2 (installed: none)</text>
-<text x="22" y="122" fill="#8b919a">==&gt; unpacking</text>
-<text x="22" y="144" fill="#8b919a">==&gt; installed Claude Desktop 3.6556.2 into ~/.local</text>
-<text x="22" y="188" fill="#d7dae0"><tspan fill="#6cb6ff">$ </tspan>claude-desktop-rpm doctor</text>
-<text x="22" y="210" fill="#e6edf3" font-weight="600">Claude Desktop</text>
-<text x="22" y="232" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>installed: 3.6556.2</text>
-<text x="22" y="254" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>launcher (dark mode fix, staged updates)</text>
-<text x="22" y="276" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>auto-update on</text>
-<text x="22" y="298" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>GNOME search provider</text>
-<text x="22" y="320" fill="#e6edf3" font-weight="600">Desktop</text>
-<text x="22" y="342" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>tray icon (AppIndicator extension on)</text>
-<text x="22" y="364" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>keyring (sign-in is saved)</text>
-<text x="22" y="386" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>Quick Entry hotkey (GlobalShortcuts portal)</text>
-<text x="22" y="408" fill="#e6edf3" font-weight="600">Cowork</text>
-<text x="22" y="430" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/kvm</text>
-<text x="22" y="452" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>in the kvm group</text>
-<text x="22" y="474" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>/dev/vhost-vsock</text>
-<text x="22" y="496" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>QEMU</text>
-<text x="22" y="518" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>UEFI firmware (edk2-ovmf)</text>
-<text x="22" y="540" fill="#d7dae0" xml:space="preserve"><tspan fill="#7ee787">  ok  </tspan>virtiofsd</text>
-<text x="22" y="562" fill="#7ee787" font-weight="600">All good.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="478" viewBox="0 0 1280 478" role="img" aria-label="Two terminals on Fedora: claude-desktop-rpm installs Claude Desktop 5.11492.2 into ~/.local and turns on daily updates; doctor reports every check ok and All good.">
+<style>
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace; font-size: 15px; }
+  .l { opacity: 0; animation: show 16s linear infinite; }
+  @keyframes show { 0% { opacity: 0; } 1% { opacity: 1; } 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .l { animation: none; opacity: 1; } }
+</style>
+<rect width="1280" height="478" rx="14" fill="#0d1117"/>
+<rect x="0.5" y="0.5" width="1279" height="477" rx="14" fill="none" stroke="#30363d"/>
+<path d="M14 0.5H1266a13.5 13.5 0 0 1 13.5 13.5V40H0.5V14A13.5 13.5 0 0 1 14 0.5z" fill="#161b22"/>
+<path d="M0.5 40H1279.5" stroke="#30363d"/>
+<circle cx="24" cy="20" r="6" fill="#ff5f57"/><circle cx="44" cy="20" r="6" fill="#febc2e"/><circle cx="64" cy="20" r="6" fill="#28c840"/>
+<g class="mono" fill="#8b949e" text-anchor="middle" font-size="13">
+<text x="360" y="25">install</text><text x="960" y="25">doctor</text></g>
+<path d="M640.5 40V478" stroke="#30363d"/>
+<g class="mono">
+<text class="l" style="animation-delay:0.20s" x="28" y="78" xml:space="preserve"><tspan fill="#7ee787">you@fedora:~$ </tspan><tspan fill="#e6edf3">./claude-desktop-rpm.sh install</tspan></text>
+<text class="l" style="animation-delay:0.55s" x="28" y="99" xml:space="preserve"><tspan fill="#51A2DA">==&gt; </tspan><tspan fill="#c9d1d9">checking Anthropic&#x27;s signed repository</tspan></text>
+<text class="l" style="animation-delay:0.90s" x="28" y="120" xml:space="preserve"><tspan fill="#51A2DA">==&gt; </tspan><tspan fill="#c9d1d9">downloading 5.11492.2 (installed: none)</tspan></text>
+<text class="l" style="animation-delay:1.25s" x="28" y="141" xml:space="preserve"><tspan fill="#6e7681">######################################## 100.0%</tspan></text>
+<text class="l" style="animation-delay:1.60s" x="28" y="162" xml:space="preserve"><tspan fill="#51A2DA">==&gt; </tspan><tspan fill="#c9d1d9">unpacking</tspan></text>
+<text class="l" style="animation-delay:1.95s" x="28" y="183" xml:space="preserve"><tspan fill="#51A2DA">==&gt; </tspan><tspan fill="#c9d1d9">installed Claude Desktop 5.11492.2 into /home/you/.local</tspan></text>
+<text class="l" style="animation-delay:2.30s" x="28" y="204" xml:space="preserve"><tspan fill="#51A2DA">==&gt; </tspan><tspan fill="#c9d1d9">auto-update on: checks daily (turn off with:</tspan></text>
+<text class="l" style="animation-delay:2.65s" x="28" y="225" xml:space="preserve"><tspan fill="#c9d1d9">    claude-desktop-rpm auto-update off)</tspan></text>
+<text class="l" style="animation-delay:3.35s" x="28" y="267" xml:space="preserve"><tspan fill="#7ee787">you@fedora:~$ </tspan><tspan fill="#e6edf3">claude-desktop-rpm version</tspan></text>
+<text class="l" style="animation-delay:3.70s" x="28" y="288" xml:space="preserve"><tspan fill="#c9d1d9">installed: 5.11492.2</tspan></text>
+<text class="l" style="animation-delay:0.20s" x="668" y="78" xml:space="preserve"><tspan fill="#7ee787">you@fedora:~$ </tspan><tspan fill="#e6edf3">claude-desktop-rpm doctor</tspan></text>
+<text class="l" style="animation-delay:0.55s" x="668" y="99" xml:space="preserve"><tspan fill="#f4a585" font-weight="700">Claude Desktop</tspan></text>
+<text class="l" style="animation-delay:0.90s" x="668" y="120" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">installed: 5.11492.2</tspan></text>
+<text class="l" style="animation-delay:1.25s" x="668" y="141" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">launcher (dark mode fix, staged updates)</tspan></text>
+<text class="l" style="animation-delay:1.60s" x="668" y="162" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">auto-update on</tspan></text>
+<text class="l" style="animation-delay:1.95s" x="668" y="183" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">GNOME search provider</tspan></text>
+<text class="l" style="animation-delay:2.30s" x="668" y="204" xml:space="preserve"><tspan fill="#f4a585" font-weight="700">Desktop</tspan></text>
+<text class="l" style="animation-delay:2.65s" x="668" y="225" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">tray icon (AppIndicator extension on)</tspan></text>
+<text class="l" style="animation-delay:3.00s" x="668" y="246" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">keyring (sign-in is saved)</tspan></text>
+<text class="l" style="animation-delay:3.35s" x="668" y="267" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">Quick Entry hotkey (GlobalShortcuts portal)</tspan></text>
+<text class="l" style="animation-delay:3.70s" x="668" y="288" xml:space="preserve"><tspan fill="#f4a585" font-weight="700">Cowork</tspan></text>
+<text class="l" style="animation-delay:4.05s" x="668" y="309" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">/dev/kvm</tspan></text>
+<text class="l" style="animation-delay:4.40s" x="668" y="330" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">in the kvm group</tspan></text>
+<text class="l" style="animation-delay:4.75s" x="668" y="351" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">/dev/vhost-vsock</tspan></text>
+<text class="l" style="animation-delay:5.10s" x="668" y="372" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">QEMU</tspan></text>
+<text class="l" style="animation-delay:5.45s" x="668" y="393" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">UEFI firmware (edk2-ovmf)</tspan></text>
+<text class="l" style="animation-delay:5.80s" x="668" y="414" xml:space="preserve"><tspan fill="#3fb950">  ok    </tspan><tspan fill="#c9d1d9">virtiofsd</tspan></text>
+<text class="l" style="animation-delay:6.15s" x="668" y="435" xml:space="preserve"><tspan fill="#3fb950" font-weight="700">All good.</tspan></text>
 </g>
 </svg>
