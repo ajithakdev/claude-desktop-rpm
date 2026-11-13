@@ -13,7 +13,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?label=Follow%20%40ajithakdev&style=social)](https://github.com/ajithakdev)
 
-[Install](#install) · [Commands](#commands) · [What it changes](#what-it-changes-on-your-system) · [Why this one](#why-this-one) · [FAQ](#faq) · [Guide](RESOURCES-AND-GUIDE.md)
+[Install](#install) · [Features](#features) · [Commands](#commands) · [What it changes](#what-it-changes-on-your-system) · [How it works](#how-it-works) · [FAQ](#faq) · [Guide](RESOURCES-AND-GUIDE.md)
+
+📰 **Featured in Fedora Magazine:** [Installing the official Claude Desktop Linux beta on Fedora Linux](https://fedoramagazine.org/installing-the-official-claude-desktop-linux-beta-on-fedora-linux/)
 
 </div>
 
@@ -42,6 +44,16 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 
 </details>
 
+## Features
+
+- **Anthropic's own build, checked first.** The signing key fingerprint, the signed repository index and every checksum must match before anything is unpacked.
+- **No root to install.** Everything goes into `~/.local` and `~/.config`, and `uninstall` takes it all back out.
+- **Fedora fixes in the launcher, not the app.** Dark mode, the tray icon, GNOME search and the app menu work out of the box, and Anthropic's files stay byte for byte as shipped.
+- **Daily updates.** A systemd user timer installs new versions; if Claude is open, the update waits until you next start it.
+- **Cowork in one command.** `cowork` installs QEMU, OVMF and virtiofsd from Fedora's repos and sets up `vhost_vsock` and the `kvm` group.
+- **Two accounts side by side.** `profile add work` adds a "Claude (work)" menu entry with its own sign-in and chats.
+- **`doctor` when something's off.** It checks the setup and prints the exact fix.
+
 ## Commands
 
 | Command | What it does |
@@ -67,9 +79,15 @@ Open **Claude** from the app menu and sign in. If anything looks off, `claude-de
 | Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
 | Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. People have also run it on KDE Plasma and on Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). |
 
-## Why this one
+## How it works
 
-Before installing anything, the script checks Anthropic's key fingerprint, that the repository index is signed by that key and hasn't expired, and the checksums of the package list and the `.deb`. It stops on any mismatch ([SECURITY.md](SECURITY.md) has the details).
+1. The script downloads Anthropic's APT repository index (`InRelease`) and signing key from `downloads.claude.ai`.
+2. It checks the key's fingerprint, that the index is signed by that key and hasn't expired, then the checksum of the package list and of the `.deb`. Any mismatch stops the install ([SECURITY.md](SECURITY.md) has the details).
+3. It unpacks the `.deb` into `~/.local/lib/claude-desktop` with `ar` and `tar`, without changing a file.
+4. It writes a launcher, a desktop entry and icons, which carry the Fedora fixes.
+5. A systemd user timer repeats steps 1 to 3 once a day.
+
+## Why this one
 
 | | claude-desktop-rpm | Third-party dnf repos | Build-your-own RPM scripts |
 | --- | --- | --- | --- |
@@ -136,6 +154,9 @@ Thanks also to the free services this project runs on: [GitHub](https://github.c
 
 ## More from me
 
+<details>
+<summary>Other things I build</summary>
+
 | Project | What it is |
 | --- | --- |
 | [Toolglass](https://toolglass.ajithakdev.com) ([repo](https://github.com/ajithakdev/toolglass)) | 41 free tools that run in your browser: image compressor, screen recorder, JSON, JWT, regex and more. Works offline, no tracking. |
@@ -146,6 +167,8 @@ Thanks also to the free services this project runs on: [GitHub](https://github.c
 | [CNoBS](https://github.com/ajithakdev/CNoBS) | Learn C in 20-minute chunks: see the output, guess, then break it. |
 
 More at [ajithakdev.com](https://ajithakdev.com).
+
+</details>
 
 ## Support
 

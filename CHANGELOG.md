@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Changed
+- README: links the Fedora Magazine article, and adds a Features list and a How it works section. The list of my other projects is folded.
+
 ### Added
 - `self-update`: replaces the script with the latest release after checking it against that release's `SHA256SUMS`. Until now, getting new commands such as `profile` meant downloading the script again by hand.
 
