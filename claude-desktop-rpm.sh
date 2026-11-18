@@ -390,9 +390,12 @@ cmd_doctor() {
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
 }
 
-# Scrub what a pasted report must not carry: the home path, emails, IDs and tokens, URL query strings.
+# Scrub what a pasted report must not carry: home paths, emails, IDs and tokens, secret-looking
+# key=value pairs, URL queries and fragments. Atomic desktops link /home to /var/home, so both go.
 redact() {
-  sed -E "s|$HOME|~|g; s/[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}/<email>/g;
+  sed -E "s#/(var/)?home/${USER:-$(id -un)}#~#g; s|$HOME|~|g; s/[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}/<email>/g;
+    s/([A-Za-z_]*(token|code|secret|password|auth)[A-Za-z_]*=)[^ ,'\"&)]+/\1<redacted>/Ig;
+    s|(https?://[^ #]*)#[^ '\"]*|\1#<fragment>|g;
     s/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/<id>/g;
     s/[A-Za-z0-9+\/=_-]{32,}/<id>/g; s/\?[^ '\"]*/?<query>/g"
 }
