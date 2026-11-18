@@ -10,7 +10,6 @@
 [![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm?style=for-the-badge&color=D97757)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?style=for-the-badge&label=downloads&color=3fb950)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
 [![Fedora 44 and 45](https://img.shields.io/badge/Fedora-44%20%7C%2045-51A2DA?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-8b949e?style=for-the-badge)](LICENSE)
 [![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?style=for-the-badge&label=follow%20%40ajithakdev&logo=github&color=24292f)](https://github.com/ajithakdev)
 
 **[Install](#install)** · **[Features](#features)** · **[Commands](#commands)** · **[What it changes](#what-it-changes-on-your-system)** · **[How it works](#how-it-works)** · **[FAQ](#faq)** · **[Guide](RESOURCES-AND-GUIDE.md)**
@@ -30,15 +29,16 @@ Anthropic publishes Claude Desktop for Linux as a `.deb` in its own APT reposito
 
 ```bash
 sudo dnf install curl gnupg2 binutils tar
-curl -fLO https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/claude-desktop-rpm.sh
+curl -fLO \
+  https://github.com/ajithakdev/claude-desktop-rpm/releases/latest/download/claude-desktop-rpm.sh
 chmod +x claude-desktop-rpm.sh && ./claude-desktop-rpm.sh install
 ```
 
 Run it as your normal user; it refuses to run as root. Open **Claude** from the app menu and sign in. The script copies itself to `~/.local/bin/claude-desktop-rpm`, so every later command works from any folder.
 
-For Cowork, run `claude-desktop-rpm cowork` once (it asks for sudo), then log out and back in. Run `claude-desktop-rpm links` once too (it also asks for sudo), so the browser Claude opens for sign-in keeps its own identity. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
+Two optional steps ask for sudo once each. `claude-desktop-rpm cowork` sets up the Cowork tab; log out and back in after it. `claude-desktop-rpm links` keeps sign-in working when your browser is Chromium, Chrome, Brave or Edge. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
 
-Tested on Fedora 44 Workstation (GNOME, x86_64), and from install to uninstall in a fresh Fedora 45 container. Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)) and on Cinnamon, where the menu entry and tray icon still need work ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)). On openSUSE Tumbleweed it works with a few manual steps ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
+Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to uninstall in fresh Fedora 44 and 45 containers. Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)) and on Cinnamon, where the menu entry and tray icon still need work ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)). On openSUSE Tumbleweed it works with a few manual steps ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
 
 <details>
 <summary><b>Screenshot</b> (Fedora 44 GNOME, dark mode)</summary>
@@ -89,9 +89,9 @@ Tested on Fedora 44 Workstation (GNOME, x86_64), and from install to uninstall i
 | :---: | --- |
 | <img src="docs/images/icons/folder.svg" width="20" height="20" alt="" /><br />Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
 | <img src="docs/images/icons/globe.svg" width="20" height="20" alt="" /><br />Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. Redirects away from HTTPS are refused. The app itself talks to Anthropic's servers, as on every platform. |
-| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. `links` does, to write `/usr/local/bin/xdg-open`: newer app builds only run programs from root-owned folders, and this one drops Claude's `CHROME_DESKTOP` before handing the link to `/usr/bin/xdg-open`. Neither changes a file a package owns, so `rpm -V` stays clean. |
+| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. `links` does, to write one file, `/usr/local/bin/xdg-open`, so a browser that Claude opens doesn't pose as Claude. Neither changes a file a package owns, so `rpm -V` stays clean. |
 | <img src="docs/images/icons/refresh.svg" width="20" height="20" alt="" /><br />Updates | A systemd user timer (`claude-desktop-rpm-update.timer`) checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
-| <img src="docs/images/icons/users.svg" width="20" height="20" alt="" /><br />Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
+| <img src="docs/images/icons/users.svg" width="20" height="20" alt="" /><br />Profiles | `profile add work` adds a "Claude (work)" menu entry. The launcher passes Chromium's `--user-data-dir`, so its data lives in `~/.config/Claude-work` and the app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile has its own tray icon. The icons look alike, and the tray menu shows each account's plan. |
 | <img src="docs/images/icons/flask.svg" width="20" height="20" alt="" /><br />Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. |
 
 ## How it works
@@ -146,7 +146,7 @@ Computer Use, which Anthropic's Linux build doesn't have yet on any distribution
 </details>
 
 <details>
-<summary><b>Something looks wrong.</b></summary>
+<summary><b>What if something looks wrong?</b></summary>
 <br />
 Run <code>claude-desktop-rpm doctor</code>. The <a href="RESOURCES-AND-GUIDE.md#when-something-goes-wrong">guide</a> covers the rest, such as the app's "Update available" button, a light System theme, or "Hardware acceleration disabled" after a reboot.
 </details>
@@ -162,7 +162,7 @@ Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTI
 <a href="https://github.com/ajithakdev/claude-desktop-rpm/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-dark.svg" /><img alt="Stars over time and script downloads per release" src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-light.svg" width="49%" align="top" /></picture></a>
 </p>
 
-Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. Both cards are redrawn four times a day. The Downloads badge above also counts `SHA256SUMS` downloads, so it reads higher than the card.
+The card counts downloads of the script itself, which is close to the number of installs, since app updates come from Anthropic and not from this script. The Downloads badge at the top also counts `SHA256SUMS`, so it reads higher. Both cards redraw four times a day.
 
 ## Credits
 
