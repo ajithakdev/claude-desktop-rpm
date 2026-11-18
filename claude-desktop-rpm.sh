@@ -401,12 +401,17 @@ case "${CHROME_DESKTOP:-}" in com.anthropic.Claude*.desktop) unset CHROME_DESKTO
 exec /usr/bin/xdg-open "$@"
 SHIM
 }
-our_link_shim() { grep -q claude-desktop-rpm /usr/local/bin/xdg-open; }
+# Ours: a plain file (not a symlink) with link_shim's own first comment line.
+our_link_shim() {
+  [ -f /usr/local/bin/xdg-open ] && [ ! -L /usr/local/bin/xdg-open ] &&
+    grep -qsxF "$(link_shim | sed -n 2p)" /usr/local/bin/xdg-open
+}
 
 cmd_links() {
   # A browser that Claude starts takes Claude's app id: it sits under Claude's dock icon, and it
   # thinks it handles claude:// itself, so "Open Claude" after sign-in does nothing.
-  [ ! -e /usr/local/bin/xdg-open ] || our_link_shim || die "/usr/local/bin/xdg-open exists and is not ours; leaving it alone"
+  [ -x /usr/bin/xdg-open ] || die "/usr/bin/xdg-open missing: sudo dnf install xdg-utils"
+  { [ ! -e /usr/local/bin/xdg-open ] && [ ! -L /usr/local/bin/xdg-open ]; } || our_link_shim || die "/usr/local/bin/xdg-open exists and is not ours; leaving it alone"
   local tmp; tmp=$(mktemp)
   link_shim > "$tmp"
   log "installing /usr/local/bin/xdg-open (sudo)"

@@ -21,7 +21,7 @@ echo "== system changes (Magazine: leave packaged files alone, prefer official p
 # /usr/local/bin/xdg-open is the one exception: no package owns /usr/local, and newer app
 # builds trust only root-owned folders on PATH (see cmd_links).
 check "no sudo command writes under /usr (except links' /usr/local/bin/xdg-open)" \
-  bash -c '! grep -nE "^\s*sudo .*[ =>]/usr/" "$1" | grep -vE "sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open$"' _ "$SCRIPT"
+  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open$"' _ "$SCRIPT"
 none "no third-party repos (Copr, config-manager, .repo files)" 'copr|config-manager|addrepo|\.repo\b|rpmfusion' "$SCRIPT"
 none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|dnf install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
 check "every sudo dnf call is install or reinstall from Fedora's repos" \

@@ -102,7 +102,7 @@ got=$(CHROME_DESKTOP=chromium-browser.desktop sh "$fake/root-shim" https://x)
 check "keeps another program's CHROME_DESKTOP (got '$got')" test "$got" = "open=https://x desktop=chromium-browser.desktop"
 # shellcheck disable=SC2016 # the bash -c snippet expands its own $1
 check "links runs sudo only for that one file" \
-  bash -c 'sed -n "/^cmd_links() {/,/^}/p" "$1" | grep -E "^\s*sudo " | grep -qxE "\s*sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open"' _ "$SCRIPT"
+  bash -c 'test "$(sed -n "/^cmd_links() {/,/^}/p" "$1" | grep -E "^\s*sudo " | sed "s/^\s*//")" = "sudo install -D -m 755 \"\$tmp\" /usr/local/bin/xdg-open"' _ "$SCRIPT"
 
 echo "== profiles"
 printf '#!/bin/sh\n# Written by claude-desktop-rpm.\n' > "$P/bin/claude-desktop" # a launcher from before profiles

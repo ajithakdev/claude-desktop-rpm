@@ -29,6 +29,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] `uninstall` leaves only the regenerated desktop caches, and none of them still mention Claude
 - [ ] `cowork` installs only packages from Fedora's repos, leaves `rpm -V edk2-ovmf` clean, writes the `vhost_vsock` file and adds the `kvm` group
 - [ ] `cowork` restores `edk2-ovmf`'s links when an older release replaced them
+- [ ] `links` refuses without `xdg-utils` and writes nothing, then writes one root-owned `/usr/local/bin/xdg-open` that no package owns, runs again cleanly, and leaves an `xdg-open` or a symlink it did not write alone
 
 `tests/mock-repo.sh` serves a fake repository on 127.0.0.1 and runs full installs into temporary folders. It checks that each of these is refused: a signature from a second key in `key.asc`, a `key.asc` without Anthropic's key, a bad signature, an expired index, a missing `Valid-Until`, a tampered `Packages`, a tampered `.deb`, an odd package path, and an older version. It also checks that a clean fake repository installs, and that `self-update` installs a script matching its `SHA256SUMS` but refuses a wrong checksum or a checksum line for another file.
 

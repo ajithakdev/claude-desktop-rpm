@@ -87,12 +87,17 @@ check "rpm -V edk2-ovmf is clean again" rpm -V edk2-ovmf
 check "links are the packaged relative ones" test "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = ../edk2/ovmf/OVMF_CODE.fd
 
 echo "== links: one root-owned xdg-open, nothing a package owns"
+check "refuses without xdg-utils, and writes nothing" bash -c "! runuser -u tester -- env HOME=/home/tester bash /tmp/claude-desktop-rpm.sh links 2>/dev/null && [ ! -e /usr/local/bin/xdg-open ]"
+dnf -y -q install xdg-utils >/dev/null
 as_user bash /tmp/claude-desktop-rpm.sh links
 check "/usr/local/bin/xdg-open is root-owned and ours" bash -c "[ \"\$(stat -c %U /usr/local/bin/xdg-open)\" = root ] && grep -q claude-desktop-rpm /usr/local/bin/xdg-open"
 check "no package owns it" bash -c "! rpm -qf /usr/local/bin/xdg-open >/dev/null 2>&1"
 check "running links again is fine" as_user bash /tmp/claude-desktop-rpm.sh links
 echo "#!/bin/sh" > /usr/local/bin/xdg-open
 check "leaves an xdg-open that is not ours alone" bash -c "! runuser -u tester -- env HOME=/home/tester bash /tmp/claude-desktop-rpm.sh links 2>/dev/null && [ \"\$(cat /usr/local/bin/xdg-open)\" = \"#!/bin/sh\" ]"
+rm /usr/local/bin/xdg-open
+ln -s /nowhere /usr/local/bin/xdg-open
+check "leaves a symlink there alone" bash -c "! runuser -u tester -- env HOME=/home/tester bash /tmp/claude-desktop-rpm.sh links 2>/dev/null && [ \"\$(readlink /usr/local/bin/xdg-open)\" = /nowhere ]"
 rm /usr/local/bin/xdg-open
 
 echo
