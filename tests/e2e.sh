@@ -164,6 +164,23 @@ check "second run is a no-op" grep -q "already the latest release" <<< "$("$SCRI
 
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
+has() { local text=$1; shift; for w in "$@"; do [[ $text == *"$w"* ]] || return 1; done; }
+report=$("$SCRIPT" doctor --report)
+check "doctor --report is one <details> block with the system and the checks" \
+  has "$report" "<details>" "OS: " "Narrowed PATH:" "Claude Desktop" "Cowork" "</details>"
+check "doctor --report never prints the home path" bash -c "! grep -qF '$HOME'" <<< "$report"
+scrubbed=$(echo "open $HOME/x for a.b@example.com id 123e4567-e89b-12d3-a456-426614174000 tok abcdefghijklmnopqrstuvwxyz0123456789 url /login?code=s3cret&state=x end /var/home/$(id -un)/y accessToken=abc12 https://claude.ai/cb#tok=zz" |
+  bash -c 'source "$1"; redact' _ "$SCRIPT")
+check "redact scrubs home paths, email, UUID, tokens, secret key=value, URL query and fragment" \
+  test "$scrubbed" = "open ~/x for <email> id <id> tok <id> url /login?<query> end ~/y accessToken=<redacted> https://claude.ai/cb#<fragment>"
+cfg=$(mktemp -d); mkdir -p "$cfg/Claude/logs"
+printf '2026-01-01 00:00:0%s %s\n' 1 "[warn] same" 2 "[warn] same" 3 "[warn] same" 4 "[info] skip me" \
+  5 "[info] [Auth] Using system browser for: /login" > "$cfg/Claude/logs/main.log"
+logpart=$(XDG_CONFIG_HOME=$cfg "$SCRIPT" doctor --report | sed -n '/^App log/,$p')
+check "the log part keeps errors, warnings and sign-in steps, and collapses repeats" \
+  has "$logpart" "[warn] same" "(repeated 3 times)" "Using system browser"
+check "the log part drops other info lines" bash -c '! grep -q "skip me"' <<< "$logpart"
+rm -rf "$cfg"
 
 echo "== uninstall"
 "$SCRIPT" uninstall

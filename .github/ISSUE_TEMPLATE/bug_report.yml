@@ -17,16 +17,10 @@ body:
       render: text
     validations:
       required: true
-  - type: input
-    id: system
+  - type: textarea
+    id: report
     attributes:
-      label: Fedora version, desktop and CPU
-      description: "Output of: cat /etc/fedora-release; echo $XDG_CURRENT_DESKTOP; uname -m"
-      placeholder: Fedora release 44, GNOME, x86_64
+      label: Output of claude-desktop-rpm doctor --report
+      description: "Your system, versions, the doctor checks and the app's recent errors, with paths, emails and IDs scrubbed. Read it before you post. If it prints usage, run claude-desktop-rpm self-update first."
     validations:
       required: true
-  - type: input
-    id: version
-    attributes:
-      label: Installed Claude Desktop version
-      description: "Output of: ./claude-desktop-rpm.sh version"

@@ -390,6 +390,65 @@ cmd_doctor() {
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
 }
 
+# Scrub what a pasted report must not carry: home paths, emails, IDs and tokens, secret-looking
+# key=value pairs, URL queries and fragments. Atomic desktops link /home to /var/home, so both go.
+redact() {
+  sed -E "s#/(var/)?home/${USER:-$(id -un)}#~#g; s|$HOME|~|g; s/[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}/<email>/g;
+    s/([A-Za-z_]*(token|code|secret|password|auth)[A-Za-z_]*=)[^ ,'\"&)]+/\1<redacted>/Ig;
+    s|(https?://[^ #]*)#[^ '\"]*|\1#<fragment>|g;
+    s/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/<id>/g;
+    s/[A-Za-z0-9+\/=_-]{32,}/<id>/g; s/\?[^ '\"]*/?<query>/g"
+}
+
+# The narrowed PATH (server flag) skips the launcher's xdg-open; only `links` covers it.
+narrowed_path() {
+  local p
+  for p in $(pgrep -f "^$APP_DIR/claude-desktop" || true); do
+    tr '\0' '\n' < "/proc/$p/environ" 2>/dev/null | grep -q '^CLAUDE_DESKTOP_NARROWED_PATH=' && return 0
+  done
+  return 1
+}
+
+# doctor --report: one Markdown block for a bug report. Reads no file in ~/.config/Claude but the app log.
+cmd_report() {
+  local applog="$CONFIG_HOME/Claude/logs/main.log" narrowed="Claude not running"
+  app_running && { narrowed=off; narrowed_path && narrowed=on; }
+  echo "<details><summary>claude-desktop-rpm doctor --report</summary>"
+  echo
+  echo "<!-- Paths, emails, IDs and URL queries are scrubbed. The log can still name your plugins and MCP servers: read it before you post. -->"
+  echo '```text'
+  # shellcheck disable=SC1091 # the running system's file
+  echo "OS:         $( (. /etc/os-release; echo "$PRETTY_NAME ($ID $VERSION_ID${VARIANT_ID:+, $VARIANT_ID})") 2>/dev/null || echo unknown)"
+  echo "Kernel:     $(uname -r) $(uname -m)"
+  echo "Desktop:    ${XDG_CURRENT_DESKTOP:-unknown} on ${XDG_SESSION_TYPE:-unknown}"
+  echo "Packages:   $(for p in rpm-ostree dnf zypper; do command -v "$p" >/dev/null && printf '%s ' "$p"; done)"
+  echo "Script:     sha256 $(sha256sum < "${BASH_SOURCE[0]}" | cut -c1-16)"
+  echo "App:        $(installed_version), $(cmd_auto_update)"
+  echo "Browser:    $(xdg-settings get default-web-browser 2>/dev/null || echo unknown)"
+  echo "Narrowed PATH: $narrowed"
+  if command -v lspci >/dev/null; then
+    echo "GPU:"
+    lspci -k 2>/dev/null | grep -A3 -E 'VGA|3D|Display' | grep -E 'VGA|3D|Display|driver in use' | sed -E 's/^\s*/  /' || true
+  fi
+  echo
+  cmd_doctor | redact
+  echo
+  echo "App log (last errors, warnings and sign-in steps):"
+  if [ -r "$applog" ]; then
+    # Collapse runs of the same message so one noisy warning can't push the rest out.
+    grep -E '\[(error|warn)\]|second-instance|Using system browser' "$applog" | awk '
+      { m = $0; sub(/^[0-9-]+ [0-9:]+ /, "", m) }
+      m == prev { n++; next }
+      { if (n) print "  (repeated " n + 1 " times)"; n = 0; prev = m; print }
+      END { if (n) print "  (repeated " n + 1 " times)" }' | tail -n 25 | redact || true
+  else
+    echo "  no log at ${applog/#$HOME/\~}"
+  fi
+  echo '```'
+  echo
+  echo "</details>"
+}
+
 # The xdg-open that \`links\` puts in /usr/local/bin. It changes nothing for other programs.
 link_shim() {
   cat <<'SHIM'
@@ -496,12 +555,12 @@ case "${1:-}" in
   install|update) cmd_install "${2:-}" ;;
   apply-staged)   cmd_apply_staged ;;
   auto-update)    cmd_auto_update "${2:-}" ;;
-  doctor)         cmd_doctor ;;
+  doctor)         if [ "${2:-}" = --report ]; then cmd_report; else cmd_doctor; fi ;;
   cowork)         cmd_cowork ;;
   links)          cmd_links ;;
   profile)        cmd_profile "${2:-}" "${3:-}" ;;
   uninstall)      cmd_uninstall ;;
   self-update)    cmd_self_update ;;
   version)        echo "installed: $(installed_version)" ;;
-  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|links|profile [add|remove NAME]|self-update|uninstall|version}"; exit 1 ;;
+  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor [--report]|cowork|links|profile [add|remove NAME]|self-update|uninstall|version}"; exit 1 ;;
 esac

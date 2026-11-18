@@ -75,7 +75,7 @@ Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to unin
 | `install`, `update` | Install the newest version. Does nothing if you're current. |
 | `update --force` | Reinstall the current version, or accept an older one. |
 | `auto-update on`, `off` | Turn the daily update check on or off. No argument shows its state. |
-| `doctor` | Check everything and print fixes. |
+| `doctor`, `doctor --report` | Check everything and print fixes. `--report` prints it all as one block to paste into a bug report. |
 | `cowork` | Set up Cowork (uses sudo). |
 | `links` | Put a small `xdg-open` in `/usr/local/bin` (uses sudo), so a browser Claude starts does not pose as Claude and sign-in completes. |
 | `profile add NAME`, `remove NAME` | A second account, open side by side: adds "Claude (NAME)" to the app menu with its own sign-in and chats. `profile` alone lists them. |
