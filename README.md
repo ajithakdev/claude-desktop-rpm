@@ -9,7 +9,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/ajithakdev/claude-desktop-rpm/ci.yml?style=for-the-badge&label=tests&logo=githubactions&logoColor=white)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm?style=for-the-badge&color=D97757)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?style=for-the-badge&label=downloads&color=3fb950)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
-[![Fedora 44](https://img.shields.io/badge/Fedora-44-51A2DA?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org)
+[![Fedora 44 and 45](https://img.shields.io/badge/Fedora-44%20%7C%2045-51A2DA?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-8b949e?style=for-the-badge)](LICENSE)
 [![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?style=for-the-badge&label=follow%20%40ajithakdev&logo=github&color=24292f)](https://github.com/ajithakdev)
 
@@ -38,7 +38,7 @@ Run it as your normal user; it refuses to run as root. Open **Claude** from the 
 
 For Cowork, run `claude-desktop-rpm cowork` once (it asks for sudo), then log out and back in. Run `claude-desktop-rpm links` once too (it also asks for sudo), so the browser Claude opens for sign-in keeps its own identity. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
 
-Tested on Fedora 44 Workstation (GNOME, x86_64). Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
+Tested on Fedora 44 Workstation (GNOME, x86_64), and from install to uninstall in a fresh Fedora 45 container. Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)) and on Cinnamon, where the menu entry and tray icon still need work ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)). On openSUSE Tumbleweed it works with a few manual steps ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
 
 <details>
 <summary><b>Screenshot</b> (Fedora 44 GNOME, dark mode)</summary>
@@ -177,6 +177,10 @@ These people found bugs, tested on other desktops or reviewed the project, and i
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/glb"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-glb.svg" width="72" height="72" alt="Gregory Lee Bartholomew" /></a><br /><a href="https://discussion.fedoraproject.org/u/glb"><sub><b>Gregory Lee Bartholomew</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/rlengland"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-rlengland.svg" width="72" height="72" alt="Richard England" /></a><br /><a href="https://discussion.fedoraproject.org/u/rlengland"><sub><b>Richard England</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/jflory7"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-jflory7.svg" width="72" height="72" alt="Justin Wheeler" /></a><br /><a href="https://discussion.fedoraproject.org/u/jflory7"><sub><b>Justin Wheeler</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="150"><a href="https://github.com/edouard-lopez"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-edouard-lopez.svg" width="72" height="72" alt="Édouard Lopez" /></a><br /><a href="https://github.com/edouard-lopez"><sub><b>Édouard Lopez</b></sub></a><br /><sub>Cinnamon test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/15">#15</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/17">#17</a></sub></td>
   </tr>
 </table>
 

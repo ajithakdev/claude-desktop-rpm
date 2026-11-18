@@ -30,6 +30,8 @@ CREDITS = {
     "glb": ("Gregory Lee Bartholomew", "fedora"),
     "rlengland": ("Richard England", "fedora"),
     "jflory7": ("Justin Wheeler", "fedora"),
+    "edouard-lopez": ("Édouard Lopez", "https://github.com/edouard-lopez.png?size=128"),
+    "whud": ("whud", "https://github.com/whud.png?size=128"),
 }
 FEDORA = "https://discussion.fedoraproject.org"
 ICON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "docs", "images", "icon-96.png")
