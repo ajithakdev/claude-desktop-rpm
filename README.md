@@ -170,17 +170,31 @@ Maintained by [ajithakdev](https://github.com/ajithakdev). Written with help fro
 
 These people found bugs, tested on other desktops or reviewed the project, and it is better for it. Fedora names link to their [Fedora Discussion](https://discussion.fedoraproject.org) profiles, where the [article review](https://discussion.fedoraproject.org/t/205949) and the [script thread](https://discussion.fedoraproject.org/t/205947) happened.
 
+**Testing on other desktops and distributions**
+
 <table>
   <tr>
     <td align="center" valign="top" width="150"><a href="https://github.com/aurora"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-aurora.svg" width="72" height="72" alt="Harald Lapp" /></a><br /><a href="https://github.com/aurora"><sub><b>Harald Lapp</b></sub></a><br /><sub>KDE Plasma test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/2">#2</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://github.com/edouard-lopez"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-edouard-lopez.svg" width="72" height="72" alt="Édouard Lopez" /></a><br /><a href="https://github.com/edouard-lopez"><sub><b>Édouard Lopez</b></sub></a><br /><sub>Cinnamon test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/15">#15</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/17">#17</a></sub></td>
+  </tr>
+</table>
+
+**Bug reports and security**
+
+<table>
+  <tr>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/thephatlee"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-thephatlee.svg" width="72" height="72" alt="Marko Jokinen" /></a><br /><a href="https://discussion.fedoraproject.org/u/thephatlee"><sub><b>Marko Jokinen</b></sub></a><br /><sub>Signature check <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/7">#7</a></sub></td>
+  </tr>
+</table>
+
+**Fedora Magazine review**
+
+<table>
+  <tr>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/glb"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-glb.svg" width="72" height="72" alt="Gregory Lee Bartholomew" /></a><br /><a href="https://discussion.fedoraproject.org/u/glb"><sub><b>Gregory Lee Bartholomew</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/rlengland"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-rlengland.svg" width="72" height="72" alt="Richard England" /></a><br /><a href="https://discussion.fedoraproject.org/u/rlengland"><sub><b>Richard England</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://discussion.fedoraproject.org/u/jflory7"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-jflory7.svg" width="72" height="72" alt="Justin Wheeler" /></a><br /><a href="https://discussion.fedoraproject.org/u/jflory7"><sub><b>Justin Wheeler</b></sub></a><br /><sub>Magazine review <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/8">#8</a> <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/9">#9</a></sub></td>
-  </tr>
-  <tr>
-    <td align="center" valign="top" width="150"><a href="https://github.com/edouard-lopez"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-edouard-lopez.svg" width="72" height="72" alt="Édouard Lopez" /></a><br /><a href="https://github.com/edouard-lopez"><sub><b>Édouard Lopez</b></sub></a><br /><sub>Cinnamon test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/15">#15</a></sub></td>
-    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/17">#17</a></sub></td>
   </tr>
 </table>
 
