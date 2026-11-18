@@ -49,6 +49,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
+- [ ] `doctor --report` is one `<details>` block with the system and the checks, never prints the home path, and its log part keeps only errors, warnings and sign-in steps with repeats collapsed; `redact` scrubs home paths, emails, UUIDs, tokens and URL queries
 - [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
 - [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
 - [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider
@@ -64,7 +65,7 @@ CI runs the same script on every push and every Monday.
 - [ ] With the browser fully closed, open a link from Claude (for example the update notice). The browser gets its own dock icon, not Claude's, and Settings > Apps > Default Apps still shows your browser. Test it cold: a browser that is already open keeps its own environment, which is how this bug got past us (`CHROME_DESKTOP` leaked from Claude into the browser it started)
 - [ ] Settings > Appearance > System: dark when GNOME's style is Dark, light when Light (quit and reopen Claude after switching)
 - [ ] Light and Dark buttons still work
-- [ ] `claude-desktop-rpm doctor` shows no warnings you didn't expect
+- [ ] `claude-desktop-rpm doctor` shows no warnings you didn't expect, and `doctor --report` shows nothing you wouldn't post
 - [ ] `systemctl --user list-timers claude-desktop-rpm-update.timer` shows the next run; `auto-update off` removes it and `auto-update on` brings it back
 - [ ] Run `systemctl --user start claude-desktop-rpm-update.service` with an older version installed and Claude open: a notification says the update is ready, and reopening Claude starts the new version
 - [ ] GNOME Activities search for a Claude session title shows it, and clicking it opens the session

@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- `doctor --report` prints one block to paste into a bug report: OS, desktop, GPU, versions, the doctor checks, whether Claude runs with the narrowed PATH, and the app log's recent errors, warnings and sign-in steps. Home paths, emails, IDs, tokens and URL queries are scrubbed. The bug report form asks for it (#25).
+
 ### Changed
 - README: the stats and release cards redraw four times a day instead of once, so they trail the Downloads badge by hours, not a day. The caption says why the badge reads higher (it also counts `SHA256SUMS` downloads).
 - README: shorter Install, Root and Profiles text, the install command no longer runs off the edge, the badges fit on one row, and Fedora 45 is listed as tested.

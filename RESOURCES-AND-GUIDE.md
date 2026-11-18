@@ -105,6 +105,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Problem | Fix |
 | --- | --- |
 | Not sure what's wrong | `claude-desktop-rpm doctor` |
+| Reporting a bug | Paste `claude-desktop-rpm doctor --report` into the issue; paths, emails and IDs are scrubbed, but read it first |
 | Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
 | "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
 | Ctrl+Alt+Space (Quick Entry) does nothing on GNOME Wayland | A bug in the app itself ([anthropics/claude-code#89160](https://github.com/anthropics/claude-code/issues/89160)), with or without profiles. Use the tray icon > Open Quick Entry instead |
