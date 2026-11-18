@@ -162,7 +162,7 @@ Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTI
 <a href="https://github.com/ajithakdev/claude-desktop-rpm/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-dark.svg" /><img alt="Stars over time and script downloads per release" src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-light.svg" width="49%" align="top" /></picture></a>
 </p>
 
-Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. Both cards are redrawn daily.
+Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. Both cards are redrawn four times a day. The Downloads badge above also counts `SHA256SUMS` downloads, so it reads higher than the card.
 
 ## Credits
 
