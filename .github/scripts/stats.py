@@ -210,9 +210,6 @@ def main():
     history[today.isoformat()] = total_dl
     with open(hist_path, "w") as f:
         json.dump(history, f, indent=0, sort_keys=True)
-    # The README badge reads this (shields.io endpoint), so it counts the same script downloads as the card.
-    with open(os.path.join(outdir, "downloads.json"), "w") as f:
-        json.dump({"schemaVersion": 1, "label": "downloads", "message": str(total_dl), "color": "3fb950"}, f)
     star_days = {}
     for d in stars:
         star_days[d] = star_days.get(d, 0) + 1

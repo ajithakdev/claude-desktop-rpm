@@ -1,6 +1,6 @@
 name: Stats
 
-# Redraws the README stats and release cards and the downloads badge four times a day. The SVGs live on the `stats` branch,
+# Redraws the README stats and release cards four times a day. The SVGs live on the `stats` branch,
 # which holds a single commit that each run replaces, so it never grows.
 on:
   schedule:
@@ -38,7 +38,7 @@ jobs:
         run: |
           cd out
           git init -q -b stats
-          git add history.json downloads.json stats-*.svg release-*.svg avatar-*.svg
+          git add history.json stats-*.svg release-*.svg avatar-*.svg
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
             commit -q -m "chore: update stats card"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" stats
