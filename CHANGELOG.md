@@ -4,6 +4,12 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- `links`: writes one small `/usr/local/bin/xdg-open` (asks for sudo). `doctor` warns until you run it.
+
+### Fixed
+- Signing in could stall at "Finish sign-in in the Claude app" when the browser wasn't already open, and the browser showed up under Claude's dock icon again. Newer Claude Desktop builds run programs only from root-owned folders, so they skipped the launcher's `xdg-open` from 1.3.0, and the browser inherited Claude's `CHROME_DESKTOP`. A browser that thinks it is Claude also thinks it handles `claude://`, so it never handed the sign-in back. `links` puts the fix where those builds look.
+
 ## [1.3.0] - 2026-11-14
 
 ### Added

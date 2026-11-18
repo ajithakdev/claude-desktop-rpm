@@ -136,6 +136,7 @@ elif read -r last 2>/dev/null < "$LAST_PROFILE"; then
   esac
 fi
 # Links Claude opens go through the xdg-open above, so the browser does not pose as Claude.
+# Newer builds keep only root-owned folders on their PATH and skip it; \`links\` covers those.
 export PATH="$SHIM_DIR:\$PATH"
 # The app asks GNOME for its Quick Entry shortcut (Ctrl+Alt+Space) on every start, and GNOME
 # shows an "Add Keyboard Shortcuts" prompt that comes back for each profile. The shortcut never
@@ -375,6 +376,9 @@ cmd_doctor() {
       "install your desktop's portal backend (xdg-desktop-portal-gnome or -kde)" has_shortcuts_portal
   fi
 
+  probe "links open your browser as itself" "a browser Claude starts poses as Claude (wrong dock icon, sign-in stalls)" \
+    "$0 links" our_link_shim
+
   echo "Cowork"
   probe "/dev/kvm" "/dev/kvm missing" "turn on SVM or VT-x in your BIOS" test -e /dev/kvm
   probe "in the kvm group" "not in the kvm group" "$0 cowork, then log out and in" in_kvm_group
@@ -384,6 +388,31 @@ cmd_doctor() {
   probe "virtiofsd" "virtiofsd missing" "$0 cowork" has_virtiofsd
 
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
+}
+
+# The xdg-open that \`links\` puts in /usr/local/bin. It changes nothing for other programs.
+link_shim() {
+  cat <<'SHIM'
+#!/bin/sh
+# Written by claude-desktop-rpm. Claude Desktop keeps only root-owned folders on its PATH,
+# so this is the xdg-open it runs. Every program it opens inherits CHROME_DESKTOP, and a
+# browser started that way poses as Claude. Drop it for Claude; pass everything else through.
+case "${CHROME_DESKTOP:-}" in com.anthropic.Claude*.desktop) unset CHROME_DESKTOP ;; esac
+exec /usr/bin/xdg-open "$@"
+SHIM
+}
+our_link_shim() { grep -q claude-desktop-rpm /usr/local/bin/xdg-open; }
+
+cmd_links() {
+  # A browser that Claude starts takes Claude's app id: it sits under Claude's dock icon, and it
+  # thinks it handles claude:// itself, so "Open Claude" after sign-in does nothing.
+  [ ! -e /usr/local/bin/xdg-open ] || our_link_shim || die "/usr/local/bin/xdg-open exists and is not ours; leaving it alone"
+  local tmp; tmp=$(mktemp)
+  link_shim > "$tmp"
+  log "installing /usr/local/bin/xdg-open (sudo)"
+  sudo install -D -m 755 "$tmp" /usr/local/bin/xdg-open
+  rm -f "$tmp"
+  log "links from Claude now open your browser as itself; quit your browser once so it restarts clean"
 }
 
 cmd_cowork() {
@@ -451,6 +480,7 @@ cmd_uninstall() {
   update-desktop-database "$SHARE_DIR/applications" 2>/dev/null || true
   update-mime-database "$SHARE_DIR/mime" 2>/dev/null || true
   gtk-update-icon-cache -f -t "$SHARE_DIR/icons/hicolor" 2>/dev/null || true
+  [ -e /usr/local/bin/xdg-open ] && our_link_shim && log "to remove the link fix as well: sudo rm /usr/local/bin/xdg-open"
   log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude and any Claude-<profile> folders are kept)"
 }
 
@@ -463,9 +493,10 @@ case "${1:-}" in
   auto-update)    cmd_auto_update "${2:-}" ;;
   doctor)         cmd_doctor ;;
   cowork)         cmd_cowork ;;
+  links)          cmd_links ;;
   profile)        cmd_profile "${2:-}" "${3:-}" ;;
   uninstall)      cmd_uninstall ;;
   self-update)    cmd_self_update ;;
   version)        echo "installed: $(installed_version)" ;;
-  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|profile [add|remove NAME]|self-update|uninstall|version}"; exit 1 ;;
+  *) echo "usage: $0 {install|update [--force]|auto-update [on|off]|doctor|cowork|links|profile [add|remove NAME]|self-update|uninstall|version}"; exit 1 ;;
 esac

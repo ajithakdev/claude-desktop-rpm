@@ -91,6 +91,19 @@ printf '#!/bin/sh\necho "open=$* desktop=${CHROME_DESKTOP:-}"\n' > "$fake/xdg-op
 got=$(CHROME_DESKTOP=com.anthropic.Claude.desktop PATH="$P/lib/claude-desktop-rpm:$fake:$PATH" "$P/lib/claude-desktop-rpm/xdg-open" https://x)
 check "shim opens the link without CHROME_DESKTOP (got '$got')" test "$got" = "open=https://x desktop="
 
+echo "== links: the /usr/local/bin xdg-open drops only Claude's CHROME_DESKTOP"
+# Newer app builds keep only root-owned folders on PATH; cmd_links installs this one there.
+bash -c 'source "$1"; link_shim' _ "$SCRIPT" | sed "s|/usr/bin/xdg-open|$fake/xdg-open|" > "$fake/root-shim"
+for d in com.anthropic.Claude.desktop com.anthropic.Claude-work.desktop; do
+  got=$(CHROME_DESKTOP=$d sh "$fake/root-shim" "https://x y")
+  check "drops $d (got '$got')" test "$got" = "open=https://x y desktop="
+done
+got=$(CHROME_DESKTOP=chromium-browser.desktop sh "$fake/root-shim" https://x)
+check "keeps another program's CHROME_DESKTOP (got '$got')" test "$got" = "open=https://x desktop=chromium-browser.desktop"
+# shellcheck disable=SC2016 # the bash -c snippet expands its own $1
+check "links runs sudo only for that one file" \
+  bash -c 'sed -n "/^cmd_links() {/,/^}/p" "$1" | grep -E "^\s*sudo " | grep -qxE "\s*sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open"' _ "$SCRIPT"
+
 echo "== profiles"
 printf '#!/bin/sh\n# Written by claude-desktop-rpm.\n' > "$P/bin/claude-desktop" # a launcher from before profiles
 "$SCRIPT" profile add work >/dev/null

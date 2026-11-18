@@ -18,13 +18,16 @@ check() { local what=$1; shift; if "$@"; then echo "  ok: $what"; pass=$((pass +
 none() { local what=$1 pat=$2; shift 2; local hits; hits=$(grep -nIE "$pat" "$@" 2>/dev/null); [ -z "$hits" ] || echo "${hits//$'\n'/$'\n'        }" | sed '1s/^/        /' >&2; check "$what" test -z "$hits"; }
 
 echo "== system changes (Magazine: leave packaged files alone, prefer official packages)"
-none "no sudo command writes under /usr" '^\s*sudo .*[ =>]/usr/' "$SCRIPT"
+# /usr/local/bin/xdg-open is the one exception: no package owns /usr/local, and newer app
+# builds trust only root-owned folders on PATH (see cmd_links).
+check "no sudo command writes under /usr (except links' /usr/local/bin/xdg-open)" \
+  bash -c '! grep -nE "^\s*sudo .*[ =>]/usr/" "$1" | grep -vE "sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open$"' _ "$SCRIPT"
 none "no third-party repos (Copr, config-manager, .repo files)" 'copr|config-manager|addrepo|\.repo\b|rpmfusion' "$SCRIPT"
 none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|dnf install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
 check "every sudo dnf call is install or reinstall from Fedora's repos" \
   bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y [a-z0-9 -]+$"' _ "$SCRIPT"
-check "the app install never runs sudo (only cmd_cowork does)" \
-  bash -c '! sed "/^cmd_cowork() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
+check "the app install never runs sudo (only cmd_cowork and cmd_links do)" \
+  bash -c '! sed "/^cmd_cowork() {/,/^}/d; /^cmd_links() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
 check "refuses to run as root" grep -q 'id -u)" -ne 0 ] || die' "$SCRIPT"
 check "only contacts downloads.claude.ai and this repo's own releases (self-update)" \
   bash -c '! grep -oE "https?://[^\" ]+" "$1" | grep -vE "^https://downloads\.claude\.ai(/|$)|^https://github\.com/ajithakdev/claude-desktop-rpm/releases/latest/download$"' _ "$SCRIPT"

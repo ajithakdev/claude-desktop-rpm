@@ -36,7 +36,7 @@ chmod +x claude-desktop-rpm.sh && ./claude-desktop-rpm.sh install
 
 Run it as your normal user; it refuses to run as root. Open **Claude** from the app menu and sign in. The script copies itself to `~/.local/bin/claude-desktop-rpm`, so every later command works from any folder.
 
-For Cowork, run `claude-desktop-rpm cowork` once (it asks for sudo), then log out and back in. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
+For Cowork, run `claude-desktop-rpm cowork` once (it asks for sudo), then log out and back in. Run `claude-desktop-rpm links` once too (it also asks for sudo), so the browser Claude opens for sign-in keeps its own identity. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
 
 Tested on Fedora 44 Workstation (GNOME, x86_64). Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
 
@@ -77,6 +77,7 @@ Tested on Fedora 44 Workstation (GNOME, x86_64). Reported working on KDE Plasma 
 | `auto-update on`, `off` | Turn the daily update check on or off. No argument shows its state. |
 | `doctor` | Check everything and print fixes. |
 | `cowork` | Set up Cowork (uses sudo). |
+| `links` | Put a small `xdg-open` in `/usr/local/bin` (uses sudo), so a browser Claude starts does not pose as Claude and sign-in completes. |
 | `profile add NAME`, `remove NAME` | A second account, open side by side: adds "Claude (NAME)" to the app menu with its own sign-in and chats. `profile` alone lists them. |
 | `self-update` | Replace the script with the latest release, after checking it against that release's `SHA256SUMS`. The daily timer updates the app, not the script. |
 | `version` | Print the installed version. |
@@ -88,7 +89,7 @@ Tested on Fedora 44 Workstation (GNOME, x86_64). Reported working on KDE Plasma 
 | :---: | --- |
 | <img src="docs/images/icons/folder.svg" width="20" height="20" alt="" /><br />Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
 | <img src="docs/images/icons/globe.svg" width="20" height="20" alt="" /><br />Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. Redirects away from HTTPS are refused. The app itself talks to Anthropic's servers, as on every platform. |
-| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. It never changes a file a package owns, so `rpm -V` stays clean. |
+| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. `links` does, to write `/usr/local/bin/xdg-open`: newer app builds only run programs from root-owned folders, and this one drops Claude's `CHROME_DESKTOP` before handing the link to `/usr/bin/xdg-open`. Neither changes a file a package owns, so `rpm -V` stays clean. |
 | <img src="docs/images/icons/refresh.svg" width="20" height="20" alt="" /><br />Updates | A systemd user timer (`claude-desktop-rpm-update.timer`) checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
 | <img src="docs/images/icons/users.svg" width="20" height="20" alt="" /><br />Profiles | `profile add work` writes one menu entry. The launcher starts that entry with Chromium's own `--user-data-dir` flag, so its data lives in `~/.config/Claude-work`. The app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile gets its own tray icon, and they look the same (the icon is the app's own file, which we don't change); the tray menu shows each account's plan. |
 | <img src="docs/images/icons/flask.svg" width="20" height="20" alt="" /><br />Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. |
