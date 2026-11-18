@@ -4,14 +4,13 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
-### Added
-- `links`: writes one small `/usr/local/bin/xdg-open` (asks for sudo). `doctor` warns until you run it.
+## [1.3.1] - 2026-11-19
 
 ### Changed
 - README: Fedora 45 confirmed in a fresh container (install, Cowork, uninstall), with Cinnamon and openSUSE Tumbleweed reports and their testers in the Credits.
 
 ### Fixed
-- Signing in could stall at "Finish sign-in in the Claude app" when the browser wasn't already open, and the browser showed up under Claude's dock icon again. Newer Claude Desktop builds run programs only from root-owned folders, so they skipped the launcher's `xdg-open` from 1.3.0, and the browser inherited Claude's `CHROME_DESKTOP`. A browser that thinks it is Claude also thinks it handles `claude://`, so it never handed the sign-in back. `links` puts the fix where those builds look.
+- Signing in could stall at "Finish sign-in in the Claude app" when the browser wasn't already open, and the browser showed up under Claude's dock icon again. Some newer Claude Desktop builds (Anthropic turns this on per user) run programs only from root-owned folders, so they skipped the launcher's `xdg-open` from 1.3.0, and the browser inherited Claude's `CHROME_DESKTOP`. A browser that thinks it is Claude also thinks it handles `claude://`, so it never handed the sign-in back. This hits Chromium-based browsers (Chromium, Chrome, Brave, Edge); Firefox ignores `CHROME_DESKTOP`. Run `claude-desktop-rpm links` once: it writes one small `/usr/local/bin/xdg-open` (asks for sudo) where those builds look, and `doctor` warns until you do.
 
 ## [1.3.0] - 2026-11-14
 
@@ -105,7 +104,8 @@ Security release (#7). To upgrade from 1.1.0, download the new script and run `.
 ### Changed
 - Renamed from claude-desktop-fedora. The script is now `claude-desktop-rpm.sh`.
 
-[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/ajithakdev/claude-desktop-rpm/compare/v1.1.2...v1.1.3
