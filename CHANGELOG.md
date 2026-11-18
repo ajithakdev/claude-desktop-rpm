@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Changed
+- README: the Downloads badge now counts script downloads only, the same number as the stats card (it used to add `SHA256SUMS` downloads, about a quarter of the total). The cards and badge redraw four times a day instead of once.
+
 ## [1.3.1] - 2026-11-19
 
 ### Changed

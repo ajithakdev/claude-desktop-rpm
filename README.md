@@ -8,7 +8,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/ajithakdev/claude-desktop-rpm/ci.yml?style=for-the-badge&label=tests&logo=githubactions&logoColor=white)](https://github.com/ajithakdev/claude-desktop-rpm/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/ajithakdev/claude-desktop-rpm?style=for-the-badge&color=D97757)](https://github.com/ajithakdev/claude-desktop-rpm/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/ajithakdev/claude-desktop-rpm/total?style=for-the-badge&label=downloads&color=3fb950)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
+[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fajithakdev%2Fclaude-desktop-rpm%2Fstats%2Fdownloads.json&style=for-the-badge)](https://github.com/ajithakdev/claude-desktop-rpm/releases)
 [![Fedora 44 and 45](https://img.shields.io/badge/Fedora-44%20%7C%2045-51A2DA?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-8b949e?style=for-the-badge)](LICENSE)
 [![Follow @ajithakdev](https://img.shields.io/github/followers/ajithakdev?style=for-the-badge&label=follow%20%40ajithakdev&logo=github&color=24292f)](https://github.com/ajithakdev)
@@ -162,7 +162,7 @@ Bug reports, test reports from other desktops and fixes are welcome. [CONTRIBUTI
 <a href="https://github.com/ajithakdev/claude-desktop-rpm/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-dark.svg" /><img alt="Stars over time and script downloads per release" src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/stats-light.svg" width="49%" align="top" /></picture></a>
 </p>
 
-Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. Both cards are redrawn daily.
+Downloads count the script itself, per release; GitHub doesn't keep a daily history. Updates come from Anthropic's repository, not this script, so this is close to the number of installs. The cards and the Downloads badge are redrawn four times a day and count the same thing.
 
 ## Credits
 
