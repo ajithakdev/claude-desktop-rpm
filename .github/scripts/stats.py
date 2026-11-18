@@ -20,7 +20,7 @@ ASSET = "claude-desktop-rpm.sh"
 # Anthropic's package list, read only to show the newest app version on the card.
 PACKAGES = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages"
 # Desktops someone has run the script on; add one when a test report comes in.
-TESTED = ["Fedora 44 GNOME", "KDE Plasma 6.7", "Fedora Atomic (Aurora)"]
+TESTED = ["Fedora 44, 45 GNOME", "KDE Plasma 6.7", "Fedora Atomic (Aurora)"]
 CHECKS = ["Signed index", "SHA256 checked", "No root", "Unmodified app"]
 # People in the README Credits, drawn as round avatars from their current profile picture.
 # Fedora Discussion avatar URLs change with the picture, so they are looked up each run.

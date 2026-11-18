@@ -6,6 +6,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ### Changed
 - README: the stats and release cards redraw four times a day instead of once, so they trail the Downloads badge by hours, not a day. The caption says why the badge reads higher (it also counts `SHA256SUMS` downloads).
+- README: shorter Install, Root and Profiles text, the install command no longer runs off the edge, the badges fit on one row, and Fedora 45 is listed as tested.
 
 ## [1.3.1] - 2026-11-19
 
