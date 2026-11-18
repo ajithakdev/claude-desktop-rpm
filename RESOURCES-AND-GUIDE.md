@@ -84,7 +84,8 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.local/lib/claude-desktop/` | The app, unmodified |
 | `~/.local/lib/claude-desktop.staged/` | An update waiting for the next launch (only while one waits) |
 | `~/.local/bin/claude-desktop` | Launcher: dark mode, staged updates, `--profile NAME` |
-| `~/.local/lib/claude-desktop-rpm/xdg-open` | Opens links from Claude without Claude's `CHROME_DESKTOP`, so the browser keeps its own dock icon |
+| `~/.local/lib/claude-desktop-rpm/xdg-open` | Opens links from Claude without Claude's `CHROME_DESKTOP`, so the browser keeps its own dock icon (older app builds) |
+| `/usr/local/bin/xdg-open` | Written by `links` (sudo). The same fix for newer app builds, which only run programs from root-owned folders. Remove with `sudo rm /usr/local/bin/xdg-open` |
 | `~/.local/bin/claude-desktop-rpm` | This script |
 | `~/.local/bin/ccd` | Anthropic's `ccd` helper, linked from the app |
 | `~/.local/share/applications/com.anthropic.Claude.desktop` | Menu entry and `claude://` handler (sign-in needs it) |
@@ -107,7 +108,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
 | "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
 | Ctrl+Alt+Space (Quick Entry) does nothing on GNOME Wayland | A bug in the app itself ([anthropics/claude-code#89160](https://github.com/anthropics/claude-code/issues/89160)), with or without profiles. Use the tray icon > Open Quick Entry instead |
-| Browser windows show under Claude's dock icon, or Claude became your default browser | Happened before the `xdg-open` fix when Claude started the browser for a link. Quit the browser, run `claude-desktop-rpm update --force` once for the new launcher, then set your browser again in Settings > Apps > Default Apps |
+| Browser windows show under Claude's dock icon, "Open Claude" after sign-in does nothing, or Claude became your default browser | Claude started the browser and it took Claude's identity. Quit the browser, run `claude-desktop-rpm links` once (sudo), then sign in again. If Claude is your default browser, set yours again in Settings > Apps > Default Apps |
 | GNOME keeps asking to "Add Keyboard Shortcuts" (Ctrl+Alt+Space) | The prompt comes from the app (Quick Entry asks GNOME for a global shortcut). The launcher skips that request on GNOME since the shortcut never fires there; run `claude-desktop-rpm update --force` once for the new launcher |
 | No tray icon on GNOME | `gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com`. If that says it doesn't exist, first `sudo dnf install gnome-shell-extension-appindicator` (in a real terminal) and log out and in |
 | System theme stays light | Run `claude-desktop-rpm update --force` once to get the new launcher, then reopen Claude |
