@@ -19,7 +19,7 @@ CI runs ShellCheck and all four test scripts on every push and PR. Before a rele
 ## Rules
 
 - Never weaken the verification steps (key fingerprint, `InRelease` signed by that key, `Valid-Until`, no downgrade, both checksums). A PR that skips one will be closed. A new check gets a tampered case in `tests/mock-repo.sh`.
-- The app installs to `~/.local` without sudo. Only `cowork` may use sudo, and only to install Fedora packages and set up KVM. Never write or link anything under `/usr`; Fedora's packages own it.
+- The app installs to `~/.local` without sudo. Only `cowork` (to install packages and set up KVM) and `links` may use sudo. Never write or link anything under `/usr`; the distribution's packages own it. The two exceptions are named line by line in `tests/guidelines.sh`: `links` writes `/usr/local/bin/xdg-open`, and `cowork` on openSUSE links the firmware into `/usr/share/OVMF`, which openSUSE's firmware package doesn't use.
 - Never patch files inside Anthropic's app. Fixes go in the launcher, the desktop entry, or system setup.
 - Add a line to `CHANGELOG.md` under `## [Unreleased]`.
 - Commit messages start with `feat:`, `fix:`, `docs:`, `ci:` or `chore:`.

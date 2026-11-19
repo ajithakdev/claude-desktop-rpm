@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end check: real download from Anthropic, install into a throwaway prefix,
 # then update, launcher, version and uninstall. Never touches ~/.local.
+# shellcheck disable=SC2016 # the bash -c snippets expand their own $1 and $2
 set -euo pipefail
 
 SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/claude-desktop-rpm.sh"
@@ -165,8 +166,51 @@ check "second run is a no-op" grep -q "already the latest release" <<< "$("$SCRI
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 
+echo "== distro: Tumbleweed and Leap get zypper, everything else stays on dnf"
+o=$P/.os; mkdir -p "$o"
+printf 'NAME="openSUSE Tumbleweed"\nID="opensuse-tumbleweed"\nID_LIKE="opensuse suse"\n' > "$o/tw"
+printf 'NAME="openSUSE Leap"\nID="opensuse-leap"\nID_LIKE="suse opensuse"\n' > "$o/leap"
+printf 'NAME="Fedora Linux"\nID=fedora\n' > "$o/fedora"
+distro_of() { CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; echo "$DISTRO $PKG $GPG_PKG"' _ "$SCRIPT"; }
+check "Tumbleweed: zypper and gpg2" test "$(distro_of "$o/tw")" = "suse zypper gpg2"
+check "Leap: zypper and gpg2" test "$(distro_of "$o/leap")" = "suse zypper gpg2"
+check "Fedora: dnf and gnupg2" test "$(distro_of "$o/fedora")" = "fedora dnf gnupg2"
+check "no os-release: Fedora" test "$(distro_of "$o/missing")" = "fedora dnf gnupg2"
+check "the missing-tools hint names zypper on Tumbleweed" \
+  bash -c 'CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c "source \"\$1\"; need no-such-tool" _ "$2" 2>&1 | grep -q "sudo zypper install curl gpg2"' _ "$o/tw" "$SCRIPT"
+
+# Runs cowork with sudo replaced by a recorder, so nothing on this machine changes.
+cowork_dry() { # os-release, firmware dir
+  CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; SUSE_OVMF_CODE=$2/code.bin SUSE_OVMF_VARS=$2/vars.bin
+    sudo() { echo "sudo $*"; }; cmd_cowork' _ "$SCRIPT" "$2" 2>&1
+}
+if [ -e /dev/kvm ]; then
+  fw=$o/fw; mkdir -p "$fw"; : > "$fw/code.bin"; : > "$fw/vars.bin"
+  out=$(cowork_dry "$o/tw" "$fw")
+  check "Tumbleweed cowork installs openSUSE's packages" grep -qx "sudo zypper install -y qemu-x86 qemu-ovmf-x86_64 virtiofsd" <<< "$out"
+  check "Tumbleweed cowork never calls dnf" bash -c '! grep -q dnf <<< "$1"' _ "$out"
+  real() { [ -e "$1" ] && [ ! -L "$1" ]; }
+  if real /usr/share/OVMF/OVMF_CODE.fd || real /usr/share/OVMF/OVMF_VARS.fd; then
+    check "a real firmware file is left alone" bash -c '! grep -q "sudo ln" <<< "$1" && grep -q "leaving the firmware alone" <<< "$1"' _ "$out"
+  else
+    check "Tumbleweed cowork links both firmware files" \
+      bash -c 'grep -qx "sudo ln -sfn $2/code.bin /usr/share/OVMF/OVMF_CODE.fd" <<< "$1" && grep -qx "sudo ln -sfn $2/vars.bin /usr/share/OVMF/OVMF_VARS.fd" <<< "$1"' _ "$out" "$fw"
+  fi
+  out=$(cowork_dry "$o/tw" "$o/nofw" || true)
+  check "missing openSUSE firmware stops cowork before any link" \
+    bash -c 'grep -q "code.bin missing" <<< "$1" && ! grep -qE "sudo (mkdir|ln)" <<< "$1"' _ "$out"
+  out=$(cowork_dry "$o/fedora" "$fw")
+  check "Fedora cowork still installs Fedora's packages" grep -qx "sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd" <<< "$out"
+  check "Fedora cowork never links under /usr/share/OVMF" bash -c '! grep -qE "sudo (zypper|mkdir|ln)" <<< "$1"' _ "$out"
+else
+  echo "  skip: cowork dry runs (no /dev/kvm here)"
+fi
+
 echo "== uninstall"
-"$SCRIPT" uninstall
+out=$("$SCRIPT" uninstall); echo "$out"
+if [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/qemu/ovmf-x86_64-4m-code.bin ]; then
+  check "uninstall says how to remove the openSUSE firmware links" grep -qF "sudo rm /usr/share/OVMF/OVMF_CODE.fd" <<< "$out"
+fi
 for f in lib/claude-desktop lib/claude-desktop-rpm bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \
   share/applications/com.anthropic.Claude-home.desktop .config/claude-desktop-rpm/last-profile \
   share/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini share/dbus-1/services/com.anthropic.Claude.SearchProvider.service; do

@@ -14,12 +14,12 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 
 `tests/guidelines.sh` reads the repo and checks it against Fedora's rules: the [Fedora Magazine writing guidelines](https://docs.fedoraproject.org/en-US/fedora-magazine/writing-guidelines/), the [AI-Assisted Contributions Policy](https://docs.fedoraproject.org/en-US/council/policy/ai-contribution-policy/) and what the Magazine editors asked for in the [article proposal](https://discussion.fedoraproject.org/t/205949). It checks that:
 
-- [ ] no `sudo` command writes under `/usr` except `links` writing `/usr/local/bin/xdg-open`, there are no third-party repos (Copr included), no `rpm -i` from a URL and no `curl | sh`
-- [ ] every `sudo dnf` call installs or reinstalls Fedora packages, and only `cowork` and `links` run sudo
+- [ ] no `sudo` command writes under `/usr` except `links` writing `/usr/local/bin/xdg-open` and `cowork` linking the firmware into `/usr/share/OVMF` (openSUSE branch only), there are no third-party repos (Copr included), no `rpm -i` from a URL and no `curl | sh`
+- [ ] every `sudo dnf` call installs or reinstalls Fedora packages, every `sudo zypper` call installs openSUSE packages, and only `cowork` and `links` run sudo
 - [ ] the script refuses root and only contacts `downloads.claude.ai`, plus this repo's latest release for `self-update`
 - [ ] the license is MIT with an SPDX header; the README says Claude Desktop is proprietary, which plan each feature needs, links Anthropic's terms, says it isn't affiliated and discloses AI help
 - [ ] the docs have no em or en dashes, no exclusionary terms, US spelling, third-party names styled as their owners do, and sentence-case headings
-- [ ] every relative link and README anchor resolves, CHANGELOG has an Unreleased section, and the README covers every command and needed package
+- [ ] every relative link and README anchor resolves, CHANGELOG has an Unreleased section, and the README covers every command and needed package (on both the `dnf` and `zypper` lines)
 
 `tests/sandbox.sh` starts a fresh Fedora 44 container and works as a normal user with no sudo rights. It checks that:
 
@@ -49,9 +49,10 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
+- [ ] a Tumbleweed or Leap `os-release` picks zypper, anything else `dnf`; with sudo replaced by a recorder, `cowork` runs the right commands on each and stops before linking when the firmware is missing (skipped without `/dev/kvm`)
 - [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
 - [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
-- [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider
+- [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider, and prints how to remove the openSUSE firmware links (checked only where those links exist)
 
 CI runs the same script on every push and every Monday.
 
@@ -76,3 +77,8 @@ CI runs the same script on every push and every Monday.
 - [ ] `profile add work`, open "Claude (work)", sign in with a second account: both windows stay open, each keeps its own chats after a restart, and a sign-in started from the browser lands in the right window
 - [ ] with two profiles open, the Quick Entry hotkey still opens one of them and no error or repeated shortcut dialog appears
 - [ ] after `uninstall`, a `.mcpb` file no longer opens with Claude
+
+On openSUSE Tumbleweed (no CI; Leap is untested, only its package names were checked in a Leap 16.0 container):
+
+- [ ] the README's zypper line is enough for `install`, and `doctor` is green
+- [ ] `cowork`, log out and in: `doctor` shows no Cowork warnings, a Cowork task starts, and `rpm -V qemu-ovmf-x86_64` prints nothing
