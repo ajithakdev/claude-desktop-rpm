@@ -99,7 +99,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.config/claude-desktop-rpm/no-auto-update` | Present only after `auto-update off` |
 | `~/.config/Claude/` | Your chats and sign-in (the app's own; uninstall keeps it) |
 | `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo). It also installs packages and adds you to the `kvm` group; on Fedora nothing under `/usr` is changed. |
-| `/usr/share/OVMF/OVMF_CODE.fd`, `/usr/share/OVMF/OVMF_VARS.fd` | openSUSE only: `cowork` (sudo) links them to the firmware in `/usr/share/qemu`, because the app looks for its firmware only in `/usr/share/OVMF`. Remove with `sudo rm /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd && sudo rmdir /usr/share/OVMF` |
+| `/usr/share/OVMF/OVMF_CODE.fd`, `/usr/share/OVMF/OVMF_VARS.fd` | openSUSE only: `cowork` (sudo) links them to the firmware in `/usr/share/qemu`, because the app looks for its firmware only in `/usr/share/OVMF`. It leaves files or links it didn't make alone. Remove with `sudo rm /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd && sudo rmdir /usr/share/OVMF` |
 
 ## When something goes wrong
 

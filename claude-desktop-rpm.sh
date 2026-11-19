@@ -41,9 +41,9 @@ distro() {
   case "$id" in opensuse-tumbleweed|opensuse-leap) echo suse ;; *) echo fedora ;; esac
 }
 DISTRO=$(distro)
-PKG=dnf; GPG_PKG=gnupg2
-if [ "$DISTRO" = suse ]; then PKG=zypper; GPG_PKG=gpg2; fi
-# openSUSE's qemu-ovmf-x86_64 ships the plain 4 MB firmware (no Secure Boot keys, no SMM) here.
+PKG=dnf; GPG_PKG=gnupg2; OVMF_PKG=edk2-ovmf
+if [ "$DISTRO" = suse ]; then PKG=zypper; GPG_PKG=gpg2; OVMF_PKG=qemu-ovmf-x86_64; fi
+# openSUSE's qemu-ovmf-x86_64 ships the plain 4 MB firmware (no enrolled keys, no SMM) here.
 SUSE_OVMF_CODE=/usr/share/qemu/ovmf-x86_64-4m-code.bin
 SUSE_OVMF_VARS=/usr/share/qemu/ovmf-x86_64-4m-vars.bin
 
@@ -361,6 +361,8 @@ in_kvm_group()      { id -nG "$USER" | grep -qw kvm; }
 has_virtiofsd()     { [ -x /usr/libexec/virtiofsd ] || command -v virtiofsd; }
 # Releases up to 1.1.2 replaced edk2-ovmf's relative link with this absolute one.
 old_ovmf_link()     { [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/edk2/ovmf/OVMF_CODE.fd ]; }
+# cowork may (re)link a firmware path only when it is missing, a dangling link, or already ours.
+ovmf_ok() { [ ! -e "$1" ] || [ "$(readlink "$1")" = "$2" ]; }
 packaged_ovmf() {
   # On openSUSE cowork links the firmware there; -e follows the link, so a dangling one fails.
   if [ "$DISTRO" = suse ]; then [ -e /usr/share/OVMF/OVMF_CODE.fd ]; return; fi
@@ -406,7 +408,7 @@ cmd_doctor() {
   probe "in the kvm group" "not in the kvm group" "$0 cowork, then log out and in" in_kvm_group
   probe "/dev/vhost-vsock" "vhost_vsock not loaded" "$0 cowork" test -e /dev/vhost-vsock
   probe "QEMU" "QEMU missing" "$0 cowork" command -v qemu-system-x86_64
-  probe "UEFI firmware (edk2-ovmf)" "edk2-ovmf firmware missing or its link was changed" "$0 cowork" packaged_ovmf
+  probe "UEFI firmware ($OVMF_PKG)" "$OVMF_PKG firmware missing or its link was changed" "$0 cowork" packaged_ovmf
   probe "virtiofsd" "virtiofsd missing" "$0 cowork" has_virtiofsd
 
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
@@ -455,16 +457,14 @@ cmd_cowork() {
     for f in "$SUSE_OVMF_CODE" "$SUSE_OVMF_VARS"; do
       [ -e "$f" ] || die "$f missing: qemu-ovmf-x86_64 may have renamed it, please report it"
     done
-    # Only ever replace a link: a real file there came from something else.
-    if [ -e /usr/share/OVMF/OVMF_CODE.fd ] && [ ! -L /usr/share/OVMF/OVMF_CODE.fd ]; then
-      log "/usr/share/OVMF/OVMF_CODE.fd is a real file, not a link; leaving the firmware alone"
-    elif [ -e /usr/share/OVMF/OVMF_VARS.fd ] && [ ! -L /usr/share/OVMF/OVMF_VARS.fd ]; then
-      log "/usr/share/OVMF/OVMF_VARS.fd is a real file, not a link; leaving the firmware alone"
-    else
+    # Both or neither: anything there that isn't ours (a real file, a folder, someone else's link) stays.
+    if ovmf_ok /usr/share/OVMF/OVMF_CODE.fd "$SUSE_OVMF_CODE" && ovmf_ok /usr/share/OVMF/OVMF_VARS.fd "$SUSE_OVMF_VARS"; then
       log "linking openSUSE's OVMF firmware into /usr/share/OVMF, where Claude looks for it"
       sudo mkdir -p /usr/share/OVMF
       sudo ln -sfn "$SUSE_OVMF_CODE" /usr/share/OVMF/OVMF_CODE.fd
       sudo ln -sfn "$SUSE_OVMF_VARS" /usr/share/OVMF/OVMF_VARS.fd
+    else
+      log "/usr/share/OVMF already has firmware files that aren't ours; leaving them alone"
     fi
   else
     sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd

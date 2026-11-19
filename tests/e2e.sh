@@ -171,13 +171,25 @@ o=$P/.os; mkdir -p "$o"
 printf 'NAME="openSUSE Tumbleweed"\nID="opensuse-tumbleweed"\nID_LIKE="opensuse suse"\n' > "$o/tw"
 printf 'NAME="openSUSE Leap"\nID="opensuse-leap"\nID_LIKE="suse opensuse"\n' > "$o/leap"
 printf 'NAME="Fedora Linux"\nID=fedora\n' > "$o/fedora"
-distro_of() { CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; echo "$DISTRO $PKG $GPG_PKG"' _ "$SCRIPT"; }
-check "Tumbleweed: zypper and gpg2" test "$(distro_of "$o/tw")" = "suse zypper gpg2"
-check "Leap: zypper and gpg2" test "$(distro_of "$o/leap")" = "suse zypper gpg2"
-check "Fedora: dnf and gnupg2" test "$(distro_of "$o/fedora")" = "fedora dnf gnupg2"
-check "no os-release: Fedora" test "$(distro_of "$o/missing")" = "fedora dnf gnupg2"
+distro_of() { CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; echo "$DISTRO $PKG $GPG_PKG $OVMF_PKG"' _ "$SCRIPT"; }
+check "Tumbleweed: zypper, gpg2, qemu-ovmf-x86_64" test "$(distro_of "$o/tw")" = "suse zypper gpg2 qemu-ovmf-x86_64"
+check "Leap: same as Tumbleweed" test "$(distro_of "$o/leap")" = "suse zypper gpg2 qemu-ovmf-x86_64"
+check "Fedora: dnf, gnupg2, edk2-ovmf" test "$(distro_of "$o/fedora")" = "fedora dnf gnupg2 edk2-ovmf"
+check "no os-release: Fedora" test "$(distro_of "$o/missing")" = "fedora dnf gnupg2 edk2-ovmf"
 check "the missing-tools hint names zypper on Tumbleweed" \
   bash -c 'CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c "source \"\$1\"; need no-such-tool" _ "$2" 2>&1 | grep -q "sudo zypper install curl gpg2"' _ "$o/tw" "$SCRIPT"
+
+echo "== cowork relinks only missing, dangling or its own firmware links"
+l=$o/links; mkdir -p "$l/dir"; : > "$l/fw"; : > "$l/other"; : > "$l/real"
+ln -s "$l/gone" "$l/dangling"; ln -s "$l/fw" "$l/ours"; ln -s "$l/other" "$l/foreign"
+may_link() { bash -c 'source "$1"; ovmf_ok "$2" "$3"' _ "$SCRIPT" "$1" "$l/fw"; }
+must_skip() { ! may_link "$1"; }
+check "missing: links" may_link "$l/none"
+check "dangling link: relinks" may_link "$l/dangling"
+check "already our link: relinks" may_link "$l/ours"
+check "someone else's link: leaves it" must_skip "$l/foreign"
+check "a real file: leaves it" must_skip "$l/real"
+check "a folder: leaves it" must_skip "$l/dir"
 
 # Runs cowork with sudo replaced by a recorder, so nothing on this machine changes.
 cowork_dry() { # os-release, firmware dir
@@ -187,19 +199,21 @@ cowork_dry() { # os-release, firmware dir
 if [ -e /dev/kvm ]; then
   fw=$o/fw; mkdir -p "$fw"; : > "$fw/code.bin"; : > "$fw/vars.bin"
   out=$(cowork_dry "$o/tw" "$fw")
+  check "Tumbleweed cowork runs to the end" grep -q "Cowork prerequisites ready" <<< "$out"
   check "Tumbleweed cowork installs openSUSE's packages" grep -qx "sudo zypper install -y qemu-x86 qemu-ovmf-x86_64 virtiofsd" <<< "$out"
   check "Tumbleweed cowork never calls dnf" bash -c '! grep -q dnf <<< "$1"' _ "$out"
-  real() { [ -e "$1" ] && [ ! -L "$1" ]; }
-  if real /usr/share/OVMF/OVMF_CODE.fd || real /usr/share/OVMF/OVMF_VARS.fd; then
-    check "a real firmware file is left alone" bash -c '! grep -q "sudo ln" <<< "$1" && grep -q "leaving the firmware alone" <<< "$1"' _ "$out"
-  else
+  # The dry run's firmware is a temp file, so anything already in /usr/share/OVMF here isn't "ours".
+  if [ ! -e /usr/share/OVMF/OVMF_CODE.fd ] && [ ! -e /usr/share/OVMF/OVMF_VARS.fd ]; then
     check "Tumbleweed cowork links both firmware files" \
       bash -c 'grep -qx "sudo ln -sfn $2/code.bin /usr/share/OVMF/OVMF_CODE.fd" <<< "$1" && grep -qx "sudo ln -sfn $2/vars.bin /usr/share/OVMF/OVMF_VARS.fd" <<< "$1"' _ "$out" "$fw"
+  else
+    check "firmware files that aren't ours are left alone" bash -c '! grep -q "sudo ln" <<< "$1" && grep -q "leaving them alone" <<< "$1"' _ "$out"
   fi
   out=$(cowork_dry "$o/tw" "$o/nofw" || true)
   check "missing openSUSE firmware stops cowork before any link" \
-    bash -c 'grep -q "code.bin missing" <<< "$1" && ! grep -qE "sudo (mkdir|ln)" <<< "$1"' _ "$out"
+    bash -c 'grep -q "code.bin missing" <<< "$1" && ! grep -qE "sudo (mkdir|ln)|prerequisites ready" <<< "$1"' _ "$out"
   out=$(cowork_dry "$o/fedora" "$fw")
+  check "Fedora cowork runs to the end" grep -q "Cowork prerequisites ready" <<< "$out"
   check "Fedora cowork still installs Fedora's packages" grep -qx "sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd" <<< "$out"
   check "Fedora cowork never links under /usr/share/OVMF" bash -c '! grep -qE "sudo (zypper|mkdir|ln)" <<< "$1"' _ "$out"
 else

@@ -49,7 +49,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
-- [ ] a Tumbleweed or Leap `os-release` picks zypper, anything else `dnf`; with sudo replaced by a recorder, `cowork` runs the right commands on each and stops before linking when the firmware is missing (skipped without `/dev/kvm`)
+- [ ] a Tumbleweed or Leap `os-release` picks zypper, anything else `dnf`; `cowork` relinks only missing, dangling or its own firmware links and leaves someone else's link, a real file or a folder alone; with sudo replaced by a recorder, `cowork` runs to the end with the right commands on each and stops before linking when the firmware is missing (the dry runs skip without `/dev/kvm`)
 - [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
 - [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
 - [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider, and prints how to remove the openSUSE firmware links (checked only where those links exist)
