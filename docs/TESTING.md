@@ -14,8 +14,8 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 
 `tests/guidelines.sh` reads the repo and checks it against Fedora's rules: the [Fedora Magazine writing guidelines](https://docs.fedoraproject.org/en-US/fedora-magazine/writing-guidelines/), the [AI-Assisted Contributions Policy](https://docs.fedoraproject.org/en-US/council/policy/ai-contribution-policy/) and what the Magazine editors asked for in the [article proposal](https://discussion.fedoraproject.org/t/205949). It checks that:
 
-- [ ] no `sudo` command writes under `/usr` except `links` writing `/usr/local/bin/xdg-open` and `cowork` linking the firmware into `/usr/share/OVMF` (openSUSE branch only), there are no third-party repos (Copr included), no `rpm -i` from a URL and no `curl | sh`
-- [ ] every `sudo dnf` call installs or reinstalls Fedora packages, every `sudo zypper` call installs openSUSE packages, and only `cowork` and `links` run sudo
+- [ ] no `sudo` command writes under `/usr` except `links` writing `/usr/local/bin/xdg-open` and `cowork` linking the firmware into `/usr/share/OVMF` (openSUSE branch only, each `ln` line named exactly), there are no third-party repos (Copr included), no `rpm -i` from a URL and no `curl | sh`
+- [ ] every `sudo dnf` call installs or reinstalls Fedora packages and every `sudo zypper` call installs openSUSE packages, by package name only (no options), and only `cowork` and `links` run sudo
 - [ ] the script refuses root and only contacts `downloads.claude.ai`, plus this repo's latest release for `self-update`
 - [ ] the license is MIT with an SPDX header; the README says Claude Desktop is proprietary, which plan each feature needs, links Anthropic's terms, says it isn't affiliated and discloses AI help
 - [ ] the docs have no em or en dashes, no exclusionary terms, US spelling, third-party names styled as their owners do, and sentence-case headings
@@ -49,7 +49,7 @@ tests/sandbox.sh   # needs podman; SKIP_COWORK=1 skips the QEMU download
 - [ ] with Claude open, `update` refuses, `update --auto` stages the new version without touching the app, and does not download it twice
 - [ ] `apply-staged` waits while Claude is open, then installs the staged version and clears the stage
 - [ ] `doctor` runs
-- [ ] a Tumbleweed or Leap `os-release` picks zypper, anything else `dnf`; `cowork` relinks only missing, dangling or its own firmware links and leaves someone else's link, a real file or a folder alone; with sudo replaced by a recorder, `cowork` runs to the end with the right commands on each and stops before linking when the firmware is missing (the dry runs skip without `/dev/kvm`)
+- [ ] a Tumbleweed or Leap `os-release` picks zypper, anything else `dnf`; `cowork` relinks only missing, dangling or its own firmware links and leaves someone else's link, a real file or a folder alone; the two links are judged together, so with CODE ours and VARS missing or someone else's, `doctor` warns and there's no uninstall hint; `cowork` stops before sudo if `/usr/share/OVMF` isn't a folder; with sudo replaced by a recorder, `cowork` runs to the end on each, writes no links when both are already ours or someone else's, and stops before linking when the firmware is missing (the dry runs skip without `/dev/kvm`)
 - [ ] `profile add` writes a menu entry whose every `Exec` passes `--profile`, without the `claude://` handler; `profile list` shows it; bad names and removing a missing profile fail
 - [ ] the launcher gives `--profile NAME` its own `--user-data-dir`, rejects bad names, sends `claude://` links to the profile opened last only while it is open, and back to default after a plain launch; `profile remove` refuses while the profile is open
 - [ ] `uninstall` removes the app, launcher, script copy, menu entry, `xdg-open` shim, profile entries, the last-profile file and search provider, and prints how to remove the openSUSE firmware links (checked only where those links exist)

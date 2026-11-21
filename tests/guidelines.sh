@@ -22,15 +22,15 @@ echo "== system changes (Magazine: leave packaged files alone, prefer official p
 # and newer app builds trust only root-owned folders on PATH (see cmd_links). /usr/share/OVMF on
 # openSUSE: the app looks only there, and openSUSE's firmware package doesn't use it (see cmd_cowork).
 check "no sudo command writes under /usr (except links' xdg-open and the openSUSE firmware links)" \
-  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*(sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open|sudo mkdir -p /usr/share/OVMF|sudo ln -sfn \"\\\$SUSE_OVMF_(CODE|VARS)\" /usr/share/OVMF/OVMF_(CODE|VARS)\.fd)$"' _ "$SCRIPT"
+  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*(sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open|sudo mkdir -p /usr/share/OVMF|sudo ln -sfn \"\\\$SUSE_OVMF_CODE\" /usr/share/OVMF/OVMF_CODE\.fd|sudo ln -sfn \"\\\$SUSE_OVMF_VARS\" /usr/share/OVMF/OVMF_VARS\.fd)$"' _ "$SCRIPT"
 check "the /usr/share/OVMF writes happen only in cowork's openSUSE branch" \
   bash -c '! sed "/^  if \[ \"\\\$DISTRO\" = suse \]; then\$/,/^  else\$/d" "$1" | grep -qE "^\s*sudo .*/usr/share/OVMF"' _ "$SCRIPT"
 none "no third-party repos (Copr, config-manager, .repo files)" 'copr|config-manager|addrepo|\.repo\b|rpmfusion' "$SCRIPT"
 none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|(dnf|zypper) install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
-check "every sudo dnf call is install or reinstall from Fedora's repos" \
-  bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y [a-z0-9 -]+$"' _ "$SCRIPT"
-check "every sudo zypper call is install from openSUSE's repos" \
-  bash -c '! grep -nE "^\s*sudo zypper" "$1" | grep -vE "sudo zypper install -y [a-z0-9_ -]+$"' _ "$SCRIPT"
+check "every sudo dnf call is install or reinstall from Fedora's repos, by package name only" \
+  bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y( [a-z0-9][a-z0-9-]*)+$"' _ "$SCRIPT"
+check "every sudo zypper call is install from openSUSE's repos, by package name only" \
+  bash -c '! grep -nE "^\s*sudo zypper" "$1" | grep -vE "sudo zypper install -y( [a-z0-9][a-z0-9_-]*)+$"' _ "$SCRIPT"
 check "the app install never runs sudo (only cmd_cowork and cmd_links do)" \
   bash -c '! sed "/^cmd_cowork() {/,/^}/d; /^cmd_links() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
 check "refuses to run as root" grep -q 'id -u)" -ne 0 ] || die' "$SCRIPT"
