@@ -18,14 +18,19 @@ check() { local what=$1; shift; if "$@"; then echo "  ok: $what"; pass=$((pass +
 none() { local what=$1 pat=$2; shift 2; local hits; hits=$(grep -nIE "$pat" "$@" 2>/dev/null); [ -z "$hits" ] || echo "${hits//$'\n'/$'\n'        }" | sed '1s/^/        /' >&2; check "$what" test -z "$hits"; }
 
 echo "== system changes (Magazine: leave packaged files alone, prefer official packages)"
-# /usr/local/bin/xdg-open is the one exception: no package owns /usr/local, and newer app
-# builds trust only root-owned folders on PATH (see cmd_links).
-check "no sudo command writes under /usr (except links' /usr/local/bin/xdg-open)" \
-  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open$"' _ "$SCRIPT"
+# Two exceptions, each named line by line. /usr/local/bin/xdg-open: no package owns /usr/local,
+# and newer app builds trust only root-owned folders on PATH (see cmd_links). /usr/share/OVMF on
+# openSUSE: the app looks only there, and openSUSE's firmware package doesn't use it (see cmd_cowork).
+check "no sudo command writes under /usr (except links' xdg-open and the openSUSE firmware links)" \
+  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*(sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open|sudo mkdir -p /usr/share/OVMF|sudo ln -sfn \"\\\$SUSE_OVMF_CODE\" /usr/share/OVMF/OVMF_CODE\.fd|sudo ln -sfn \"\\\$SUSE_OVMF_VARS\" /usr/share/OVMF/OVMF_VARS\.fd)$"' _ "$SCRIPT"
+check "the /usr/share/OVMF writes happen only in cowork's openSUSE branch" \
+  bash -c '! sed "/^  if \[ \"\\\$DISTRO\" = suse \]; then\$/,/^  else\$/d" "$1" | grep -qE "^\s*sudo .*/usr/share/OVMF"' _ "$SCRIPT"
 none "no third-party repos (Copr, config-manager, .repo files)" 'copr|config-manager|addrepo|\.repo\b|rpmfusion' "$SCRIPT"
-none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|dnf install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
-check "every sudo dnf call is install or reinstall from Fedora's repos" \
-  bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y [a-z0-9 -]+$"' _ "$SCRIPT"
+none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|(dnf|zypper) install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
+check "every sudo dnf call is install or reinstall from Fedora's repos, by package name only" \
+  bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y( [a-z0-9][a-z0-9-]*)+$"' _ "$SCRIPT"
+check "every sudo zypper call is install from openSUSE's repos, by package name only" \
+  bash -c '! grep -nE "^\s*sudo zypper" "$1" | grep -vE "sudo zypper install -y( [a-z0-9][a-z0-9_-]*)+$"' _ "$SCRIPT"
 check "the app install never runs sudo (only cmd_cowork and cmd_links do)" \
   bash -c '! sed "/^cmd_cowork() {/,/^}/d; /^cmd_links() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
 check "refuses to run as root" grep -q 'id -u)" -ne 0 ] || die' "$SCRIPT"
@@ -89,6 +94,8 @@ EOF
 check "CHANGELOG has an Unreleased section" grep -q '^## \[Unreleased\]' CHANGELOG.md
 check "README install line lists every tool the script needs" \
   bash -c 'for p in curl gnupg2 binutils tar; do grep -q "^sudo dnf install .*\<$p\>" README.md || exit 1; done'
+check "README openSUSE install line lists the same tools" \
+  bash -c 'for p in curl gpg2 binutils tar; do grep -q "^sudo zypper install .*\<$p\>" README.md || exit 1; done'
 check "every command in the usage line is in README's command table" \
   bash -c 'for c in install update auto-update doctor cowork uninstall version; do grep -q "^| \`$c" README.md || grep -q "\`$c\`" README.md || exit 1; done'
 

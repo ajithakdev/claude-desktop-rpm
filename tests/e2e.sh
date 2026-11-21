@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end check: real download from Anthropic, install into a throwaway prefix,
 # then update, launcher, version and uninstall. Never touches ~/.local.
+# shellcheck disable=SC2016 # the bash -c snippets expand their own $1 and $2
 set -euo pipefail
 
 SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/claude-desktop-rpm.sh"
@@ -165,8 +166,93 @@ check "second run is a no-op" grep -q "already the latest release" <<< "$("$SCRI
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
 
+echo "== distro: Tumbleweed and Leap get zypper, everything else stays on dnf"
+o=$P/.os; mkdir -p "$o"
+printf 'NAME="openSUSE Tumbleweed"\nID="opensuse-tumbleweed"\nID_LIKE="opensuse suse"\n' > "$o/tw"
+printf 'NAME="openSUSE Leap"\nID="opensuse-leap"\nID_LIKE="suse opensuse"\n' > "$o/leap"
+printf 'NAME="Fedora Linux"\nID=fedora\n' > "$o/fedora"
+distro_of() { CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; echo "$DISTRO $PKG $GPG_PKG $OVMF_PKG"' _ "$SCRIPT"; }
+check "Tumbleweed: zypper, gpg2, qemu-ovmf-x86_64" test "$(distro_of "$o/tw")" = "suse zypper gpg2 qemu-ovmf-x86_64"
+check "Leap: same as Tumbleweed" test "$(distro_of "$o/leap")" = "suse zypper gpg2 qemu-ovmf-x86_64"
+check "Fedora: dnf, gnupg2, edk2-ovmf" test "$(distro_of "$o/fedora")" = "fedora dnf gnupg2 edk2-ovmf"
+check "no os-release: Fedora" test "$(distro_of "$o/missing")" = "fedora dnf gnupg2 edk2-ovmf"
+check "the missing-tools hint names zypper on Tumbleweed" \
+  bash -c 'CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c "source \"\$1\"; need no-such-tool" _ "$2" 2>&1 | grep -q "sudo zypper install curl gpg2"' _ "$o/tw" "$SCRIPT"
+
+echo "== cowork relinks only missing, dangling or its own firmware links"
+l=$o/links; mkdir -p "$l/dir"; : > "$l/fw"; : > "$l/other"; : > "$l/real"
+ln -s "$l/gone" "$l/dangling"; ln -s "$l/fw" "$l/ours"; ln -s "$l/other" "$l/foreign"
+may_link() { bash -c 'source "$1"; ovmf_ok "$2" "$3"' _ "$SCRIPT" "$1" "$l/fw"; }
+must_skip() { ! may_link "$1"; }
+check "missing: links" may_link "$l/none"
+check "dangling link: relinks" may_link "$l/dangling"
+check "already our link: relinks" may_link "$l/ours"
+check "someone else's link: leaves it" must_skip "$l/foreign"
+check "a real file: leaves it" must_skip "$l/real"
+check "a folder: leaves it" must_skip "$l/dir"
+
+echo "== both firmware links judged together (cowork, doctor and the uninstall hint use this)"
+fw2=$o/fw2; mkdir -p "$fw2"; : > "$fw2/code.bin"; : > "$fw2/vars.bin"
+# Prints the pair's state and whether doctor would call it ok.
+pair_state() {
+  bash -c 'source "$1"; SUSE_OVMF_CODE=$2/code.bin SUSE_OVMF_VARS=$2/vars.bin
+    st=$(ovmf_state "$3/c" "$3/v"); if suse_ovmf_ready "$3/c" "$3/v"; then echo "$st ok"; else echo "$st warn"; fi' _ "$SCRIPT" "$fw2" "$1"
+}
+pair() { mkdir -p "$o/pair-$1"; echo "$o/pair-$1"; }
+d=$(pair both); ln -s "$fw2/code.bin" "$d/c"; ln -s "$fw2/vars.bin" "$d/v"
+check "both ours: doctor ok, uninstall hint, cowork changes nothing" test "$(pair_state "$d")" = "ours ok"
+d=$(pair vars-missing); ln -s "$fw2/code.bin" "$d/c"
+check "CODE ours, VARS missing: doctor warns, no uninstall hint, cowork links both" test "$(pair_state "$d")" = "free warn"
+d=$(pair vars-foreign); ln -s "$fw2/code.bin" "$d/c"; : > "$d/v"
+check "CODE ours, VARS someone else's: doctor warns, no uninstall hint, cowork leaves both" test "$(pair_state "$d")" = "taken warn"
+d=$(pair none)
+check "neither there: doctor warns, cowork links both" test "$(pair_state "$d")" = "free warn"
+blocked() { bash -c 'source "$1"; ovmf_dir_blocked "$2"' _ "$SCRIPT" "$1"; }
+not_blocked() { ! blocked "$1"; }
+ln -s "$l/gone" "$l/dir-dangling"
+check "/usr/share/OVMF as a file: cowork stops before sudo" blocked "$l/real"
+check "/usr/share/OVMF as a link to nowhere: cowork stops before sudo" blocked "$l/dir-dangling"
+check "a folder is not blocked" not_blocked "$l/dir"
+check "a missing path is not blocked" not_blocked "$l/none"
+
+# Runs cowork with sudo replaced by a recorder, so nothing on this machine changes. An optional
+# third argument fixes what ovmf_state answers, so every branch runs whatever is on this host.
+cowork_dry() { # os-release, firmware dir, [ours|free|taken]
+  CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c 'source "$1"; SUSE_OVMF_CODE=$2/code.bin SUSE_OVMF_VARS=$2/vars.bin
+    st=$3; if [ -n "$st" ]; then ovmf_state() { echo "$st"; }; fi
+    sudo() { echo "sudo $*"; }; cmd_cowork' _ "$SCRIPT" "$2" "${3:-}" 2>&1
+}
+if [ -e /dev/kvm ] && { [ -d /usr/share/OVMF ] || { [ ! -e /usr/share/OVMF ] && [ ! -L /usr/share/OVMF ]; }; }; then
+  fw=$o/fw; mkdir -p "$fw"; : > "$fw/code.bin"; : > "$fw/vars.bin"
+  out=$(cowork_dry "$o/tw" "$fw" free)
+  check "Tumbleweed cowork runs to the end" grep -q "Cowork prerequisites ready" <<< "$out"
+  check "Tumbleweed cowork installs openSUSE's packages" grep -qx "sudo zypper install -y qemu-x86 qemu-ovmf-x86_64 virtiofsd" <<< "$out"
+  check "Tumbleweed cowork never calls dnf" bash -c '! grep -q dnf <<< "$1"' _ "$out"
+  check "free: links both firmware files" \
+    bash -c 'grep -qx "sudo ln -sfn $2/code.bin /usr/share/OVMF/OVMF_CODE.fd" <<< "$1" && grep -qx "sudo ln -sfn $2/vars.bin /usr/share/OVMF/OVMF_VARS.fd" <<< "$1"' _ "$out" "$fw"
+  out=$(cowork_dry "$o/tw" "$fw" ours)
+  check "already ours (a rerun): no sudo mkdir or ln, and says so" \
+    bash -c '! grep -qE "sudo (mkdir|ln)" <<< "$1" && grep -q "already linked" <<< "$1" && grep -q "prerequisites ready" <<< "$1"' _ "$out"
+  out=$(cowork_dry "$o/tw" "$fw" taken)
+  check "someone else's files: no sudo mkdir or ln, and says so" \
+    bash -c '! grep -qE "sudo (mkdir|ln)" <<< "$1" && grep -q "leaving them alone" <<< "$1" && grep -q "prerequisites ready" <<< "$1"' _ "$out"
+  out=$(cowork_dry "$o/tw" "$o/nofw" || true)
+  check "missing openSUSE firmware stops cowork before any link" \
+    bash -c 'grep -q "code.bin missing" <<< "$1" && ! grep -qE "sudo (mkdir|ln)|prerequisites ready" <<< "$1"' _ "$out"
+  out=$(cowork_dry "$o/fedora" "$fw")
+  check "Fedora cowork runs to the end" grep -q "Cowork prerequisites ready" <<< "$out"
+  check "Fedora cowork still installs Fedora's packages" grep -qx "sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd" <<< "$out"
+  check "Fedora cowork never links under /usr/share/OVMF" bash -c '! grep -qE "sudo (zypper|mkdir|ln)" <<< "$1"' _ "$out"
+else
+  echo "  skip: cowork dry runs (no /dev/kvm here, or /usr/share/OVMF isn't a folder)"
+fi
+
 echo "== uninstall"
-"$SCRIPT" uninstall
+out=$("$SCRIPT" uninstall); echo "$out"
+if [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/qemu/ovmf-x86_64-4m-code.bin ] &&
+  [ "$(readlink /usr/share/OVMF/OVMF_VARS.fd)" = /usr/share/qemu/ovmf-x86_64-4m-vars.bin ]; then
+  check "uninstall says how to remove the openSUSE firmware links" grep -qF "sudo rm /usr/share/OVMF/OVMF_CODE.fd" <<< "$out"
+fi
 for f in lib/claude-desktop lib/claude-desktop-rpm bin/claude-desktop bin/claude-desktop-rpm share/applications/com.anthropic.Claude.desktop \
   share/applications/com.anthropic.Claude-home.desktop .config/claude-desktop-rpm/last-profile \
   share/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini share/dbus-1/services/com.anthropic.Claude.SearchProvider.service; do

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# Install and update Anthropic's official Claude Desktop (Linux beta) on Fedora.
+# Install and update Anthropic's official Claude Desktop (Linux beta) on Fedora
+# and openSUSE Tumbleweed.
 # Unofficial helper: downloads Anthropic's signed .deb from downloads.claude.ai,
 # verifies it, and unpacks it into ~/.local. No Anthropic files are redistributed.
 set -euo pipefail
@@ -31,6 +32,21 @@ NO_AUTO_FILE="$CONFIG_HOME/claude-desktop-rpm/no-auto-update"
 LAST_PROFILE="$CONFIG_HOME/claude-desktop-rpm/last-profile"
 SHIM_DIR="$PREFIX/lib/claude-desktop-rpm"
 
+# openSUSE Tumbleweed (and Leap, untested) gets zypper and its own package names; anything else is Fedora.
+# Read ID without sourcing the file. CLAUDE_DESKTOP_OS_RELEASE lets the tests try both branches.
+OS_RELEASE="${CLAUDE_DESKTOP_OS_RELEASE:-/etc/os-release}"
+distro() {
+  local id
+  id=$(sed -n 's/^ID=//p' "$OS_RELEASE" 2>/dev/null | tr -d "\"'") || id=
+  case "$id" in opensuse-tumbleweed|opensuse-leap) echo suse ;; *) echo fedora ;; esac
+}
+DISTRO=$(distro)
+PKG=dnf; GPG_PKG=gnupg2; OVMF_PKG=edk2-ovmf
+if [ "$DISTRO" = suse ]; then PKG=zypper; GPG_PKG=gpg2; OVMF_PKG=qemu-ovmf-x86_64; fi
+# openSUSE's qemu-ovmf-x86_64 ships the plain 4 MB firmware (no enrolled keys, no SMM) here.
+SUSE_OVMF_CODE=/usr/share/qemu/ovmf-x86_64-4m-code.bin
+SUSE_OVMF_VARS=/usr/share/qemu/ovmf-x86_64-4m-vars.bin
+
 die() { echo "error: $*" >&2; exit 1; }
 log() { echo "==> $*"; }
 notify() { command -v notify-send >/dev/null || return 0; notify-send -a Claude -i claude-desktop "$@" 2>/dev/null || true; }
@@ -40,7 +56,7 @@ notify() { command -v notify-send >/dev/null || return 0; notify-send -a Claude 
 need() {
   local missing=()
   for c in "$@"; do command -v "$c" >/dev/null || missing+=("$c"); done
-  [ ${#missing[@]} -eq 0 ] || die "missing tools: ${missing[*]} (try: sudo dnf install curl gnupg2 binutils tar coreutils)"
+  [ ${#missing[@]} -eq 0 ] || die "missing tools: ${missing[*]} (try: sudo $PKG install curl $GPG_PKG binutils tar coreutils)"
 }
 
 installed_version() { cat "$VERSION_FILE" 2>/dev/null || echo none; }
@@ -325,6 +341,8 @@ tray_on_gnome() { [[ $(gnome-extensions list --enabled 2>/dev/null) == *appindic
 tray_fix() {
   if gnome-extensions info "$TRAY_EXT" >/dev/null 2>&1; then
     echo "gnome-extensions enable $TRAY_EXT"
+  elif [ "$DISTRO" = suse ]; then # openSUSE doesn't package it
+    echo "install AppIndicator Support from extensions.gnome.org, log out and in, then gnome-extensions enable $TRAY_EXT"
   else
     echo "sudo dnf install gnome-shell-extension-appindicator, log out and in, then gnome-extensions enable $TRAY_EXT"
   fi
@@ -343,7 +361,23 @@ in_kvm_group()      { id -nG "$USER" | grep -qw kvm; }
 has_virtiofsd()     { [ -x /usr/libexec/virtiofsd ] || command -v virtiofsd; }
 # Releases up to 1.1.2 replaced edk2-ovmf's relative link with this absolute one.
 old_ovmf_link()     { [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/edk2/ovmf/OVMF_CODE.fd ]; }
-packaged_ovmf()     { [ -e /usr/share/OVMF/OVMF_CODE.fd ] && ! old_ovmf_link; }
+# cowork may (re)link a firmware path only when it is missing, a dangling link, or already ours.
+ovmf_ok() { [ ! -e "$1" ] || [ "$(readlink "$1")" = "$2" ]; }
+# The two openSUSE firmware links, judged together, so cowork, doctor and uninstall agree:
+# ours (both point at openSUSE's firmware), free (cowork may link both) or taken (something else is there).
+ovmf_state() { # code path, vars path
+  if [ "$(readlink "$1")" = "$SUSE_OVMF_CODE" ] && [ "$(readlink "$2")" = "$SUSE_OVMF_VARS" ]; then echo ours
+  elif ovmf_ok "$1" "$SUSE_OVMF_CODE" && ovmf_ok "$2" "$SUSE_OVMF_VARS"; then echo free
+  else echo taken; fi
+}
+# Both links are ours and the firmware behind them is still there.
+suse_ovmf_ready() { [ "$(ovmf_state "$1" "$2")" = ours ] && [ -e "$1" ] && [ -e "$2" ]; }
+# Something that isn't a folder (a file, or a link that leads nowhere) is where the folder should be.
+ovmf_dir_blocked() { { [ -e "$1" ] || [ -L "$1" ]; } && [ ! -d "$1" ]; }
+packaged_ovmf() {
+  if [ "$DISTRO" = suse ]; then suse_ovmf_ready /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd; return; fi
+  [ -e /usr/share/OVMF/OVMF_CODE.fd ] && ! old_ovmf_link
+}
 has_shortcuts_portal() {
   gdbus introspect --session --dest org.freedesktop.portal.Desktop --object-path /org/freedesktop/portal/desktop \
     | grep -q org.freedesktop.portal.GlobalShortcuts
@@ -370,7 +404,7 @@ cmd_doctor() {
       "$(tray_fix)" tray_on_gnome
   fi
   probe "keyring (sign-in is saved)" "no keyring: you will sign in on every launch" \
-    "sudo dnf install gnome-keyring (or use KDE Wallet on Plasma), then unlock it" keyring_running
+    "sudo $PKG install gnome-keyring (or use KDE Wallet on Plasma), then unlock it" keyring_running
   if [ "${XDG_SESSION_TYPE:-}" = wayland ]; then
     probe "Quick Entry hotkey (GlobalShortcuts portal)" "Quick Entry hotkey needs the GlobalShortcuts portal on Wayland" \
       "install your desktop's portal backend (xdg-desktop-portal-gnome or -kde)" has_shortcuts_portal
@@ -384,7 +418,12 @@ cmd_doctor() {
   probe "in the kvm group" "not in the kvm group" "$0 cowork, then log out and in" in_kvm_group
   probe "/dev/vhost-vsock" "vhost_vsock not loaded" "$0 cowork" test -e /dev/vhost-vsock
   probe "QEMU" "QEMU missing" "$0 cowork" command -v qemu-system-x86_64
-  probe "UEFI firmware (edk2-ovmf)" "edk2-ovmf firmware missing or its link was changed" "$0 cowork" packaged_ovmf
+  if [ "$DISTRO" = suse ] && [ "$(ovmf_state /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd)" = taken ]; then
+    probe "UEFI firmware ($OVMF_PKG)" "/usr/share/OVMF has firmware files cowork didn't set up, so it leaves them alone (Cowork may still work with them)" \
+      "if Cowork doesn't start, check those files; to use openSUSE's firmware instead, move them aside and run $0 cowork" packaged_ovmf
+  else
+    probe "UEFI firmware ($OVMF_PKG)" "$OVMF_PKG firmware missing or its link was changed" "$0 cowork" packaged_ovmf
+  fi
   probe "virtiofsd" "virtiofsd missing" "$0 cowork" has_virtiofsd
 
   if [ $bad = 0 ]; then echo "All good."; else echo "Fix the warnings above, then restart Claude."; fi
@@ -410,7 +449,7 @@ our_link_shim() {
 cmd_links() {
   # A browser that Claude starts takes Claude's app id: it sits under Claude's dock icon, and it
   # thinks it handles claude:// itself, so "Open Claude" after sign-in does nothing.
-  [ -x /usr/bin/xdg-open ] || die "/usr/bin/xdg-open missing: sudo dnf install xdg-utils"
+  [ -x /usr/bin/xdg-open ] || die "/usr/bin/xdg-open missing: sudo $PKG install xdg-utils"
   { [ ! -e /usr/local/bin/xdg-open ] && [ ! -L /usr/local/bin/xdg-open ]; } || our_link_shim || die "/usr/local/bin/xdg-open exists and is not ours; leaving it alone"
   local tmp; tmp=$(mktemp)
   link_shim > "$tmp"
@@ -422,13 +461,37 @@ cmd_links() {
 
 cmd_cowork() {
   # Cowork runs tasks in a QEMU/KVM VM. The app looks for firmware at
-  # /usr/share/OVMF/OVMF_CODE.fd, which Fedora's edk2-ovmf already ships.
+  # /usr/share/OVMF/OVMF_CODE.fd, which Fedora's edk2-ovmf already ships. openSUSE's
+  # qemu-ovmf-x86_64 puts its firmware in /usr/share/qemu and doesn't use /usr/share/OVMF,
+  # so there cowork links the two files into place.
   [ -e /dev/kvm ] || die "/dev/kvm missing: enable SVM/VT-x virtualization in your BIOS"
+  if [ "$DISTRO" = suse ] && ovmf_dir_blocked /usr/share/OVMF; then
+    die "/usr/share/OVMF exists but isn't a folder, so cowork can't link the firmware there; check it and move it aside, then rerun"
+  fi
   log "installing QEMU, OVMF firmware and virtiofsd (sudo)"
-  sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd
-  if old_ovmf_link; then
-    log "restoring edk2-ovmf's own firmware links (an older release replaced them)"
-    sudo dnf reinstall -y edk2-ovmf
+  if [ "$DISTRO" = suse ]; then
+    sudo zypper install -y qemu-x86 qemu-ovmf-x86_64 virtiofsd
+    local f
+    for f in "$SUSE_OVMF_CODE" "$SUSE_OVMF_VARS"; do
+      [ -e "$f" ] || die "$f missing: qemu-ovmf-x86_64 may have renamed it, please report it"
+    done
+    # Both or neither: anything there that isn't ours (a real file, a folder, someone else's link) stays.
+    case $(ovmf_state /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd) in
+      ours) log "openSUSE's firmware is already linked in /usr/share/OVMF; nothing to change" ;;
+      free)
+        log "linking openSUSE's OVMF firmware into /usr/share/OVMF, where Claude looks for it"
+        sudo mkdir -p /usr/share/OVMF
+        sudo ln -sfn "$SUSE_OVMF_CODE" /usr/share/OVMF/OVMF_CODE.fd
+        sudo ln -sfn "$SUSE_OVMF_VARS" /usr/share/OVMF/OVMF_VARS.fd
+        ;;
+      *) log "/usr/share/OVMF already has firmware files cowork didn't set up; leaving them alone (doctor has details)" ;;
+    esac
+  else
+    sudo dnf install -y qemu-system-x86-core edk2-ovmf virtiofsd
+    if old_ovmf_link; then
+      log "restoring edk2-ovmf's own firmware links (an older release replaced them)"
+      sudo dnf reinstall -y edk2-ovmf
+    fi
   fi
   echo vhost_vsock | sudo tee /etc/modules-load.d/vhost_vsock.conf >/dev/null
   sudo modprobe vhost_vsock
@@ -486,6 +549,8 @@ cmd_uninstall() {
   update-mime-database "$SHARE_DIR/mime" 2>/dev/null || true
   gtk-update-icon-cache -f -t "$SHARE_DIR/icons/hicolor" 2>/dev/null || true
   [ -e /usr/local/bin/xdg-open ] && our_link_shim && log "to remove the link fix as well: sudo rm /usr/local/bin/xdg-open"
+  [ "$(ovmf_state /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd)" = ours ] &&
+    log "to remove the openSUSE firmware links as well: sudo rm /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd && sudo rmdir /usr/share/OVMF"
   log "removed Claude Desktop (your sign-in and chats in ~/.config/Claude and any Claude-<profile> folders are kept)"
 }
 

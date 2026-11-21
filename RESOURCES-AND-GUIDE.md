@@ -62,7 +62,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 
 | Job | How |
 | --- | --- |
-| Install dependencies | `sudo dnf install curl gnupg2 binutils tar` |
+| Install dependencies | `sudo dnf install curl gnupg2 binutils tar` (openSUSE: `sudo zypper install curl gpg2 binutils tar`) |
 | Force reinstall | `claude-desktop-rpm update --force` |
 | Update the script itself | `claude-desktop-rpm self-update` (the daily timer only updates the app) |
 | Auto-update on, off, state | `claude-desktop-rpm auto-update on`, `off`, or no argument |
@@ -98,14 +98,15 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | `~/.config/Claude-NAME/` | A profile's chats and sign-in (uninstall keeps it) |
 | `~/.config/claude-desktop-rpm/no-auto-update` | Present only after `auto-update off` |
 | `~/.config/Claude/` | Your chats and sign-in (the app's own; uninstall keeps it) |
-| `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo). It also installs Fedora packages and adds you to the `kvm` group; nothing under `/usr` is changed. |
+| `/etc/modules-load.d/vhost_vsock.conf` | Written by `cowork` only (sudo). It also installs packages and adds you to the `kvm` group; on Fedora nothing under `/usr` is changed. |
+| `/usr/share/OVMF/OVMF_CODE.fd`, `/usr/share/OVMF/OVMF_VARS.fd` | openSUSE only: `cowork` (sudo) links them to the firmware in `/usr/share/qemu`, because the app looks for its firmware only in `/usr/share/OVMF`. It leaves files or links it didn't make alone. Remove with `sudo rm /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd && sudo rmdir /usr/share/OVMF` |
 
 ## When something goes wrong
 
 | Problem | Fix |
 | --- | --- |
 | Not sure what's wrong | `claude-desktop-rpm doctor` |
-| Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` |
+| Missing tools | `sudo dnf install curl gnupg2 binutils tar coreutils` (openSUSE: `sudo zypper install curl gpg2 binutils tar coreutils`) |
 | "Claude Desktop is running" | Quit from the tray icon, then rerun. No tray icon on GNOME: see the next row |
 | Ctrl+Alt+Space (Quick Entry) does nothing on GNOME Wayland | A bug in the app itself ([anthropics/claude-code#89160](https://github.com/anthropics/claude-code/issues/89160)), with or without profiles. Use the tray icon > Open Quick Entry instead |
 | Browser windows show under Claude's dock icon, "Open Claude" after sign-in does nothing, or Claude became your default browser | Claude started the browser and it took Claude's identity. Quit the browser, run `claude-desktop-rpm links` once (sudo), then sign in again. If Claude is your default browser, set yours again in Settings > Apps > Default Apps |
