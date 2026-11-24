@@ -18,16 +18,29 @@ check() { local what=$1; shift; if "$@"; then echo "  ok: $what"; pass=$((pass +
 none() { local what=$1 pat=$2; shift 2; local hits; hits=$(grep -nIE "$pat" "$@" 2>/dev/null); [ -z "$hits" ] || echo "${hits//$'\n'/$'\n'        }" | sed '1s/^/        /' >&2; check "$what" test -z "$hits"; }
 
 echo "== system changes (Magazine: leave packaged files alone, prefer official packages)"
-# /usr/local/bin/xdg-open is the one exception: no package owns /usr/local, and newer app
-# builds trust only root-owned folders on PATH (see cmd_links).
-check "no sudo command writes under /usr (except links' /usr/local/bin/xdg-open)" \
-  bash -c '! grep -nE "^\s*sudo .*[ =>\"'"'"']/usr/" "$1" | grep -vE "^[0-9]+:\s*sudo install -D -m 755 \"\\\$tmp\" /usr/local/bin/xdg-open$"' _ "$SCRIPT"
+# Every line that runs sudo, wherever on the line (after |, &&, ;, then, ...), as "N:line".
+# Comments and quoted text are ignored, so a log message that prints a sudo command for the user isn't counted.
+sudo_cmds() { awk '/^[ \t]*#/ { next } { s = $0; gsub(/"[^"]*"/, "\"\"", s); if (s ~ /(^|[;&|({]|then|do|else)[ \t]*sudo /) print NR ":" $0 }' "${1:--}"; }
+shown() { [ -z "$1" ] || echo "${1//$'\n'/$'\n'        }" | sed '1s/^/        /' >&2; test -z "$1"; }
+# Two exceptions, each named line by line, and each must be the whole line. /usr/local/bin/xdg-open:
+# no package owns /usr/local, and newer app builds trust only root-owned folders on PATH (see
+# cmd_links). /usr/share/OVMF on openSUSE: the app looks only there, and openSUSE's firmware
+# package doesn't use it (see cmd_cowork).
+allowed='^[0-9]+:\s*(sudo install -D -m 755 "\$tmp" /usr/local/bin/xdg-open|sudo mkdir -p /usr/share/OVMF|sudo ln -sfn "\$SUSE_OVMF_CODE" /usr/share/OVMF/OVMF_CODE\.fd|sudo ln -sfn "\$SUSE_OVMF_VARS" /usr/share/OVMF/OVMF_VARS\.fd)$'
+check "no sudo command writes under /usr (except links' xdg-open and the openSUSE firmware links)" \
+  shown "$(sudo_cmds "$SCRIPT" | grep -E "sudo .*[ =>\"']/usr/" | grep -vE "$allowed")"
+check "the /usr/share/OVMF writes happen only in cowork's openSUSE branch" \
+  shown "$(sed '/^cmd_cowork() {/,/^}/{/^  if \[ "\$DISTRO" = suse \]; then$/,/^  else$/d}' "$SCRIPT" | sudo_cmds | grep /usr/share/OVMF)"
+check "the openSUSE firmware links point only at openSUSE's own firmware" \
+  test "$(grep -E '^\s*SUSE_OVMF_(CODE|VARS)=' "$SCRIPT")" = $'SUSE_OVMF_CODE=/usr/share/qemu/ovmf-x86_64-4m-code.bin\nSUSE_OVMF_VARS=/usr/share/qemu/ovmf-x86_64-4m-vars.bin'
 none "no third-party repos (Copr, config-manager, .repo files)" 'copr|config-manager|addrepo|\.repo\b|rpmfusion' "$SCRIPT"
-none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|dnf install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
-check "every sudo dnf call is install or reinstall from Fedora's repos" \
-  bash -c '! grep -nE "^\s*sudo dnf" "$1" | grep -vE "sudo dnf (install|reinstall) -y [a-z0-9 -]+$"' _ "$SCRIPT"
+none "no rpm installs from URLs and no curl | sh" 'rpm -[iU]|(dnf|zypper) install[^"]*https?:|curl[^|]*\|\s*(ba)?sh' "$SCRIPT"
+check "every sudo dnf call is install or reinstall from Fedora's repos, by package name only" \
+  shown "$(sudo_cmds "$SCRIPT" | grep 'sudo dnf' | grep -vE '^[0-9]+:\s*sudo dnf (install|reinstall) -y( [a-z0-9][a-z0-9-]*)+$')"
+check "every sudo zypper call is install from openSUSE's repos, by package name only" \
+  shown "$(sudo_cmds "$SCRIPT" | grep 'sudo zypper' | grep -vE '^[0-9]+:\s*sudo zypper install -y( [a-z0-9][a-z0-9_-]*)+$')"
 check "the app install never runs sudo (only cmd_cowork and cmd_links do)" \
-  bash -c '! sed "/^cmd_cowork() {/,/^}/d; /^cmd_links() {/,/^}/d" "$1" | grep -qE "^\s*sudo "' _ "$SCRIPT"
+  shown "$(sed '/^cmd_cowork() {/,/^}/d; /^cmd_links() {/,/^}/d' "$SCRIPT" | sudo_cmds)"
 check "refuses to run as root" grep -q 'id -u)" -ne 0 ] || die' "$SCRIPT"
 check "only contacts downloads.claude.ai and this repo's own releases (self-update)" \
   bash -c '! grep -oE "https?://[^\" ]+" "$1" | grep -vE "^https://downloads\.claude\.ai(/|$)|^https://github\.com/ajithakdev/claude-desktop-rpm/releases/latest/download$"' _ "$SCRIPT"
@@ -89,6 +102,8 @@ EOF
 check "CHANGELOG has an Unreleased section" grep -q '^## \[Unreleased\]' CHANGELOG.md
 check "README install line lists every tool the script needs" \
   bash -c 'for p in curl gnupg2 binutils tar; do grep -q "^sudo dnf install .*\<$p\>" README.md || exit 1; done'
+check "README openSUSE install line lists the same tools" \
+  bash -c 'for p in curl gpg2 binutils tar; do grep -q "^sudo zypper install .*\<$p\>" README.md || exit 1; done'
 check "every command in the usage line is in README's command table" \
   bash -c 'for c in install update auto-update doctor cowork uninstall version; do grep -q "^| \`$c" README.md || grep -q "\`$c\`" README.md || exit 1; done'
 

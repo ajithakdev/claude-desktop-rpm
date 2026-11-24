@@ -4,6 +4,9 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+- openSUSE Tumbleweed ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17)): the script uses zypper and openSUSE's package names, and `cowork` links openSUSE's firmware into `/usr/share/OVMF`, where the app looks for it. Leap takes the same path but is untested beyond a Leap 16.0 container. Fedora is unchanged.
+
 ### Changed
 - README: the stats and release cards redraw four times a day instead of once, so they trail the Downloads badge by hours, not a day. The caption says why the badge reads higher (it also counts `SHA256SUMS` downloads).
 - README: shorter Install, Root and Profiles text, the install command no longer runs off the edge, the badges fit on one row, and Fedora 45 is listed as tested.

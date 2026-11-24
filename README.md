@@ -34,11 +34,17 @@ curl -fLO \
 chmod +x claude-desktop-rpm.sh && ./claude-desktop-rpm.sh install
 ```
 
+On openSUSE Tumbleweed, use this in place of the `dnf` line:
+
+```bash
+sudo zypper install curl gpg2 binutils tar
+```
+
 Run it as your normal user; it refuses to run as root. Open **Claude** from the app menu and sign in. The script copies itself to `~/.local/bin/claude-desktop-rpm`, so every later command works from any folder.
 
 Two optional steps ask for sudo once each. `claude-desktop-rpm cowork` sets up the Cowork tab; log out and back in after it. `claude-desktop-rpm links` keeps sign-in working when your browser is Chromium, Chrome, Brave or Edge. If something looks off, run `claude-desktop-rpm doctor`; every warning comes with its fix.
 
-Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to uninstall in fresh Fedora 44 and 45 containers. Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)) and on Cinnamon, where the menu entry and tray icon still need work ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)). On openSUSE Tumbleweed it works with a few manual steps ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17)). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
+Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to uninstall in fresh Fedora 44 and 45 containers. Reported working on KDE Plasma and Fedora Atomic ([#2](https://github.com/ajithakdev/claude-desktop-rpm/issues/2)) and on Cinnamon, where the menu entry and tray icon still need work ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)). Tested on openSUSE Tumbleweed (KDE Plasma, x86_64) in a VM, Cowork included ([#17](https://github.com/ajithakdev/claude-desktop-rpm/issues/17), [#31](https://github.com/ajithakdev/claude-desktop-rpm/pull/31)); Leap is untested (only its package names were checked, in a Leap 16.0 container). On aarch64 the script fetches Anthropic's arm64 package; test reports are welcome.
 
 <details>
 <summary><b>Screenshot</b> (Fedora 44 GNOME, dark mode)</summary>
@@ -59,7 +65,7 @@ Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to unin
     <td valign="top"><img src="docs/images/icons/refresh.svg" width="20" height="20" align="top" alt="" />&nbsp; <b>Daily updates</b><br /><sub>A systemd user timer runs the same verified install. If Claude is open, the update is staged and applied on the next launch.</sub></td>
   </tr>
   <tr>
-    <td valign="top"><img src="docs/images/icons/vm.svg" width="20" height="20" align="top" alt="" />&nbsp; <b>Cowork in one command</b><br /><sub>Installs QEMU, OVMF and virtiofsd from Fedora's repos, loads <code>vhost_vsock</code> at boot and adds you to the <code>kvm</code> group.</sub></td>
+    <td valign="top"><img src="docs/images/icons/vm.svg" width="20" height="20" align="top" alt="" />&nbsp; <b>Cowork in one command</b><br /><sub>Installs QEMU, OVMF and virtiofsd from Fedora's or openSUSE's repos, loads <code>vhost_vsock</code> at boot and adds you to the <code>kvm</code> group.</sub></td>
     <td valign="top"><img src="docs/images/icons/users.svg" width="20" height="20" align="top" alt="" />&nbsp; <b>Profiles</b><br /><sub><code>profile add work</code> adds a "Claude (work)" menu entry with its own sign-in and chats, open next to your default one.</sub></td>
   </tr>
   <tr>
@@ -89,7 +95,7 @@ Tested on Fedora 44 and 45 Workstation (GNOME, x86_64), and from install to unin
 | :---: | --- |
 | <img src="docs/images/icons/folder.svg" width="20" height="20" alt="" /><br />Files | Only `~/.local` and `~/.config`; every path is in the [guide](RESOURCES-AND-GUIDE.md#files-it-writes). `uninstall` removes them and rebuilds the menu, file-type and icon caches. Your chats and sign-in in `~/.config/Claude` stay. |
 | <img src="docs/images/icons/globe.svg" width="20" height="20" alt="" /><br />Network | The script only talks to `downloads.claude.ai`, plus this repo's GitHub releases when you run `self-update`. Redirects away from HTTPS are refused. The app itself talks to Anthropic's servers, as on every platform. |
-| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. `links` does, to write one file, `/usr/local/bin/xdg-open`, so a browser that Claude opens doesn't pose as Claude. Neither changes a file a package owns, so `rpm -V` stays clean. |
+| <img src="docs/images/icons/key.svg" width="20" height="20" alt="" /><br />Root | `install`, `update` and `uninstall` never use sudo. `cowork` does, to install `qemu-system-x86-core`, `edk2-ovmf` and `virtiofsd` from Fedora's repos, write `/etc/modules-load.d/vhost_vsock.conf`, load `vhost_vsock` and add you to the `kvm` group. On openSUSE it installs `qemu-x86`, `qemu-ovmf-x86_64` and `virtiofsd` instead, and links the firmware into `/usr/share/OVMF`, where the app looks for it (openSUSE's firmware package doesn't use that folder); `uninstall` prints the command that removes those links. `links` does, to write one file, `/usr/local/bin/xdg-open`, so a browser that Claude opens doesn't pose as Claude. Neither changes a file a package owns, so `rpm -V` stays clean. |
 | <img src="docs/images/icons/refresh.svg" width="20" height="20" alt="" /><br />Updates | A systemd user timer (`claude-desktop-rpm-update.timer`) checks once a day. If Claude is open, the verified update waits and goes in the next time you start it. `auto-update off` stops it. |
 | <img src="docs/images/icons/users.svg" width="20" height="20" alt="" /><br />Profiles | `profile add work` adds a "Claude (work)" menu entry. The launcher passes Chromium's `--user-data-dir`, so its data lives in `~/.config/Claude-work` and the app files stay untouched. Anthropic doesn't officially support other data folders, so a future version could ignore the flag; your default profile is never affected. Each open profile has its own tray icon. The icons look alike, and the tray menu shows each account's plan. |
 | <img src="docs/images/icons/flask.svg" width="20" height="20" alt="" /><br />Tested | `tests/sandbox.sh` checks all of this in a fresh Fedora 44 container on every pull request. |
@@ -176,7 +182,7 @@ These people found bugs, tested on other desktops or reviewed the project, and i
   <tr>
     <td align="center" valign="top" width="150"><a href="https://github.com/aurora"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-aurora.svg" width="72" height="72" alt="Harald Lapp" /></a><br /><a href="https://github.com/aurora"><sub><b>Harald Lapp</b></sub></a><br /><sub>KDE Plasma test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/2">#2</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://github.com/edouard-lopez"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-edouard-lopez.svg" width="72" height="72" alt="Édouard Lopez" /></a><br /><a href="https://github.com/edouard-lopez"><sub><b>Édouard Lopez</b></sub></a><br /><sub>Cinnamon test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/15">#15</a></sub></td>
-    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/17">#17</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE support <a href="https://github.com/ajithakdev/claude-desktop-rpm/pull/31">#31</a></sub></td>
   </tr>
 </table>
 
