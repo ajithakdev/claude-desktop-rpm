@@ -176,17 +176,21 @@ check "Tumbleweed: zypper, gpg2, qemu-ovmf-x86_64" test "$(distro_of "$o/tw")" =
 check "Leap: same as Tumbleweed" test "$(distro_of "$o/leap")" = "suse zypper gpg2 qemu-ovmf-x86_64"
 check "Fedora: dnf, gnupg2, edk2-ovmf" test "$(distro_of "$o/fedora")" = "fedora dnf gnupg2 edk2-ovmf"
 check "no os-release: Fedora" test "$(distro_of "$o/missing")" = "fedora dnf gnupg2 edk2-ovmf"
+printf 'ID=fedora\nID=opensuse-leap\n' > "$o/two-ids"
+check "two ID lines: the first one counts" test "$(distro_of "$o/two-ids")" = "fedora dnf gnupg2 edk2-ovmf"
 check "the missing-tools hint names zypper on Tumbleweed" \
   bash -c 'CLAUDE_DESKTOP_OS_RELEASE=$1 bash -c "source \"\$1\"; need no-such-tool" _ "$2" 2>&1 | grep -q "sudo zypper install curl gpg2"' _ "$o/tw" "$SCRIPT"
 
-echo "== cowork relinks only missing, dangling or its own firmware links"
+echo "== cowork links only where nothing is, or relinks its own links"
 l=$o/links; mkdir -p "$l/dir"; : > "$l/fw"; : > "$l/other"; : > "$l/real"
 ln -s "$l/gone" "$l/dangling"; ln -s "$l/fw" "$l/ours"; ln -s "$l/other" "$l/foreign"
+ln -s "$l/fw-gone" "$l/ours-dangling"
 may_link() { bash -c 'source "$1"; ovmf_ok "$2" "$3"' _ "$SCRIPT" "$1" "$l/fw"; }
 must_skip() { ! may_link "$1"; }
 check "missing: links" may_link "$l/none"
-check "dangling link: relinks" may_link "$l/dangling"
+check "someone else's dangling link: leaves it" must_skip "$l/dangling"
 check "already our link: relinks" may_link "$l/ours"
+check "our link, now dangling: relinks" bash -c 'source "$1"; ovmf_ok "$2" "$3"' _ "$SCRIPT" "$l/ours-dangling" "$l/fw-gone"
 check "someone else's link: leaves it" must_skip "$l/foreign"
 check "a real file: leaves it" must_skip "$l/real"
 check "a folder: leaves it" must_skip "$l/dir"
@@ -212,6 +216,8 @@ not_blocked() { ! blocked "$1"; }
 ln -s "$l/gone" "$l/dir-dangling"
 check "/usr/share/OVMF as a file: cowork stops before sudo" blocked "$l/real"
 check "/usr/share/OVMF as a link to nowhere: cowork stops before sudo" blocked "$l/dir-dangling"
+ln -s "$l/dir" "$l/dir-link"
+check "/usr/share/OVMF as a link to a folder: cowork stops before sudo" blocked "$l/dir-link"
 check "a folder is not blocked" not_blocked "$l/dir"
 check "a missing path is not blocked" not_blocked "$l/none"
 

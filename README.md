@@ -182,7 +182,7 @@ These people found bugs, tested on other desktops or reviewed the project, and i
   <tr>
     <td align="center" valign="top" width="150"><a href="https://github.com/aurora"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-aurora.svg" width="72" height="72" alt="Harald Lapp" /></a><br /><a href="https://github.com/aurora"><sub><b>Harald Lapp</b></sub></a><br /><sub>KDE Plasma test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/2">#2</a></sub></td>
     <td align="center" valign="top" width="150"><a href="https://github.com/edouard-lopez"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-edouard-lopez.svg" width="72" height="72" alt="Édouard Lopez" /></a><br /><a href="https://github.com/edouard-lopez"><sub><b>Édouard Lopez</b></sub></a><br /><sub>Cinnamon test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/15">#15</a></sub></td>
-    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE test <a href="https://github.com/ajithakdev/claude-desktop-rpm/issues/17">#17</a></sub></td>
+    <td align="center" valign="top" width="150"><a href="https://github.com/whud"><img src="https://raw.githubusercontent.com/ajithakdev/claude-desktop-rpm/stats/avatar-whud.svg" width="72" height="72" alt="whud" /></a><br /><a href="https://github.com/whud"><sub><b>whud</b></sub></a><br /><sub>openSUSE support <a href="https://github.com/ajithakdev/claude-desktop-rpm/pull/31">#31</a></sub></td>
   </tr>
 </table>
 

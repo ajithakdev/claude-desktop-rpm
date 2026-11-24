@@ -37,7 +37,7 @@ SHIM_DIR="$PREFIX/lib/claude-desktop-rpm"
 OS_RELEASE="${CLAUDE_DESKTOP_OS_RELEASE:-/etc/os-release}"
 distro() {
   local id
-  id=$(sed -n 's/^ID=//p' "$OS_RELEASE" 2>/dev/null | tr -d "\"'") || id=
+  id=$(sed -n '/^ID=/{s///p;q}' "$OS_RELEASE" 2>/dev/null | tr -d "\"'") || id= # the first ID= line only
   case "$id" in opensuse-tumbleweed|opensuse-leap) echo suse ;; *) echo fedora ;; esac
 }
 DISTRO=$(distro)
@@ -361,8 +361,9 @@ in_kvm_group()      { id -nG "$USER" | grep -qw kvm; }
 has_virtiofsd()     { [ -x /usr/libexec/virtiofsd ] || command -v virtiofsd; }
 # Releases up to 1.1.2 replaced edk2-ovmf's relative link with this absolute one.
 old_ovmf_link()     { [ "$(readlink /usr/share/OVMF/OVMF_CODE.fd)" = /usr/share/edk2/ovmf/OVMF_CODE.fd ]; }
-# cowork may (re)link a firmware path only when it is missing, a dangling link, or already ours.
-ovmf_ok() { [ ! -e "$1" ] || [ "$(readlink "$1")" = "$2" ]; }
+# cowork may (re)link a firmware path only when nothing is there or it is already our link
+# (even if it dangles). Someone else's link stays, dangling or not.
+ovmf_ok() { { [ ! -e "$1" ] && [ ! -L "$1" ]; } || [ "$(readlink "$1")" = "$2" ]; }
 # The two openSUSE firmware links, judged together, so cowork, doctor and uninstall agree:
 # ours (both point at openSUSE's firmware), free (cowork may link both) or taken (something else is there).
 ovmf_state() { # code path, vars path
@@ -372,8 +373,9 @@ ovmf_state() { # code path, vars path
 }
 # Both links are ours and the firmware behind them is still there.
 suse_ovmf_ready() { [ "$(ovmf_state "$1" "$2")" = ours ] && [ -e "$1" ] && [ -e "$2" ]; }
-# Something that isn't a folder (a file, or a link that leads nowhere) is where the folder should be.
-ovmf_dir_blocked() { { [ -e "$1" ] || [ -L "$1" ]; } && [ ! -d "$1" ]; }
+# Something other than a plain folder is where the folder should be: a file, or any link
+# (sudo would write wherever a link to a folder leads).
+ovmf_dir_blocked() { [ -L "$1" ] || { [ -e "$1" ] && [ ! -d "$1" ]; }; }
 packaged_ovmf() {
   if [ "$DISTRO" = suse ]; then suse_ovmf_ready /usr/share/OVMF/OVMF_CODE.fd /usr/share/OVMF/OVMF_VARS.fd; return; fi
   [ -e /usr/share/OVMF/OVMF_CODE.fd ] && ! old_ovmf_link
@@ -466,7 +468,7 @@ cmd_cowork() {
   # so there cowork links the two files into place.
   [ -e /dev/kvm ] || die "/dev/kvm missing: enable SVM/VT-x virtualization in your BIOS"
   if [ "$DISTRO" = suse ] && ovmf_dir_blocked /usr/share/OVMF; then
-    die "/usr/share/OVMF exists but isn't a folder, so cowork can't link the firmware there; check it and move it aside, then rerun"
+    die "/usr/share/OVMF exists but isn't a plain folder (it's a file or a link), so cowork won't link the firmware there; check it and move it aside, then rerun"
   fi
   log "installing QEMU, OVMF firmware and virtiofsd (sudo)"
   if [ "$DISTRO" = suse ]; then
