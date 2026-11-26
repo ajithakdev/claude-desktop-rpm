@@ -165,6 +165,12 @@ check "second run is a no-op" grep -q "already the latest release" <<< "$("$SCRI
 
 echo "== doctor"
 check "doctor runs" bash -c "'$SCRIPT' doctor >/dev/null"
+d=$(XDG_CURRENT_DESKTOP=KDE "$SCRIPT" doctor 2>&1)
+check "doctor skips the GNOME search provider off GNOME" bash -c '! grep -q "search provider" <<< "$1"' _ "$d"
+check "doctor lists the GNOME search provider on GNOME" grep -q "search provider" <<< "$(XDG_CURRENT_DESKTOP=GNOME "$SCRIPT" doctor 2>&1)"
+d=$(XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=COSMIC "$SCRIPT" doctor 2>&1)
+# The probe passes where a GlobalShortcuts portal answers; otherwise the COSMIC hint must show.
+check "doctor gives COSMIC its own Quick Entry hint" bash -c 'grep -q "ok    Quick Entry" <<< "$1" || grep -q "COSMIC.s portal" <<< "$1"' _ "$d"
 
 echo "== distro: Tumbleweed and Leap get zypper, everything else stays on dnf"
 o=$P/.os; mkdir -p "$o"

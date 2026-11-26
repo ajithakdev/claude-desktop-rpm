@@ -385,6 +385,14 @@ has_shortcuts_portal() {
     | grep -q org.freedesktop.portal.GlobalShortcuts
 }
 
+# COSMIC's portal has no GlobalShortcuts yet, so a GNOME or KDE backend is the wrong advice there.
+shortcuts_fix() {
+  case "${XDG_CURRENT_DESKTOP:-}" in
+    *COSMIC*) echo "COSMIC's portal has no global shortcuts yet; use the tray icon > Open Quick Entry" ;;
+    *) echo "install your desktop's portal backend (xdg-desktop-portal-gnome or -kde)" ;;
+  esac
+}
+
 cmd_doctor() {
   local bad=0
   # probe "ok text" "problem" "fix" command...
@@ -398,10 +406,10 @@ cmd_doctor() {
   probe "launcher (dark mode fix, staged updates)" "old launcher without the dark mode fix" "$0 update --force" our_launcher
   if [ -d "$STAGE_DIR/root" ]; then echo "  ok    update $(cat "$STAGE_DIR/version") waits for the next launch"; fi
   probe "auto-update on" "auto-update off" "$0 auto-update on" timer_on
-  probe "GNOME search provider" "GNOME search provider missing" "$0 update --force" test -f "$SEARCH_INI"
 
   echo "Desktop"
   if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
+    probe "GNOME search provider" "GNOME search provider missing" "$0 update --force" test -f "$SEARCH_INI"
     probe "tray icon (AppIndicator extension on)" "tray icon hidden: GNOME needs the AppIndicator extension" \
       "$(tray_fix)" tray_on_gnome
   fi
@@ -409,7 +417,7 @@ cmd_doctor() {
     "sudo $PKG install gnome-keyring (or use KDE Wallet on Plasma), then unlock it" keyring_running
   if [ "${XDG_SESSION_TYPE:-}" = wayland ]; then
     probe "Quick Entry hotkey (GlobalShortcuts portal)" "Quick Entry hotkey needs the GlobalShortcuts portal on Wayland" \
-      "install your desktop's portal backend (xdg-desktop-portal-gnome or -kde)" has_shortcuts_portal
+      "$(shortcuts_fix)" has_shortcuts_portal
   fi
 
   probe "links open your browser as itself" "a browser Claude starts poses as Claude (wrong dock icon, sign-in stalls)" \
