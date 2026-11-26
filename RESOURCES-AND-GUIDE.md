@@ -74,6 +74,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | Fedora rules | `tests/guidelines.sh` (packaging, licensing and Magazine writing rules, offline) |
 | Sandbox test | `tests/sandbox.sh` (fresh Fedora 44 container: install, uninstall, cowork; needs podman) |
 | Manual checklist | [docs/TESTING.md](docs/TESTING.md) |
+| Review a PR | [docs/REVIEW.md](docs/REVIEW.md): check table with evidence for outside PRs, then the Pre-merge checklist comment |
 | Release | Tick docs/TESTING.md. Move Unreleased in CHANGELOG.md to `## [X.Y.Z] - date`, commit `chore: release vX.Y.Z` on main, then `git tag vX.Y.Z && git push origin vX.Y.Z`. The Release workflow reruns every check, then publishes the release with the script, `SHA256SUMS` and that CHANGELOG section as notes |
 | Versions | Patch for fixes (security fixes ship the same day), minor for new commands or features |
 
@@ -128,6 +129,7 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 
 - [README.md](README.md): what the script does, Fedora fixes, verification, limits
 - [docs/TESTING.md](docs/TESTING.md): release checklist
+- [docs/REVIEW.md](docs/REVIEW.md): how a PR is reviewed before merge
 - [CHANGELOG.md](CHANGELOG.md): what changed in each release
 - [SECURITY.md](SECURITY.md): what the script trusts and how to report a problem
 - [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md): how to test a change

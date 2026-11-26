@@ -13,6 +13,7 @@ All notable changes to claude-desktop-rpm. The format follows [Keep a Changelog]
 - The guide explains that Claude waits while a new keyring asks for its password on first launch ([#15](https://github.com/ajithakdev/claude-desktop-rpm/issues/15)).
 
 ### Changed
+- docs/REVIEW.md: how PRs are reviewed, adapted from FlatPark's review runbook. Outside PRs get a check table with evidence, hard fails and a "not covered" list, then the Pre-merge checklist.
 - README: the stats and release cards redraw four times a day instead of once, so they trail the Downloads badge by hours, not a day. The caption says why the badge reads higher (it also counts `SHA256SUMS` downloads).
 - README: shorter Install, Root and Profiles text, the install command no longer runs off the edge, the badges fit on one row, and Fedora 45 is listed as tested.
 
