@@ -116,7 +116,8 @@ Every link for the Claude Desktop Fedora installer, what it is for, and how to r
 | System theme stays light | Run `claude-desktop-rpm update --force` once to get the new launcher, then reopen Claude |
 | App says "Update available" | Its link points to apt. Ignore it, or quit Claude and run `claude-desktop-rpm update` |
 | Signed out on every launch | Your keyring is missing or locked: `sudo dnf install gnome-keyring` and unlock it |
-| Quick Entry hotkey does nothing on Wayland | Install your desktop's portal backend (`xdg-desktop-portal-gnome` or `-kde`) |
+| Claude freezes while a "create a keyring password" prompt is open (COSMIC, or any desktop that just got `gnome-keyring`) | Expected on the first launch after installing a keyring: set the password and Claude carries on. Sign-in is kept |
+| Quick Entry hotkey does nothing on Wayland | Install your desktop's portal backend (`xdg-desktop-portal-gnome` or `-kde`). COSMIC's portal has no global shortcuts yet: use the tray icon > Open Quick Entry |
 | Whole UI in a monospace font on KDE Plasma | App bug with Interface font set to System (GNOME is fine). In Settings, Appearance, pick Anthropic Sans for Interface font and Anthropic Serif or Match interface for Response font |
 | `/dev/kvm` missing | Turn on SVM or VT-x in your BIOS |
 | "Hardware acceleration disabled" after a reboot | Claude was open at shutdown. Turn it back on from Claude's Help menu and restart Claude |
