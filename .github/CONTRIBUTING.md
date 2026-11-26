@@ -14,7 +14,7 @@ tests/sandbox.sh                          # fresh Fedora 44 container (needs pod
 ./claude-desktop-rpm.sh update --force    # then try it on your own install
 ```
 
-CI runs ShellCheck and all four test scripts on every push and PR. Before a release, go through [docs/TESTING.md](../docs/TESTING.md).
+CI runs ShellCheck and all four test scripts on every push and PR. [docs/REVIEW.md](../docs/REVIEW.md) lists what a review checks, so you can check it yourself first. Before a release, go through [docs/TESTING.md](../docs/TESTING.md).
 
 ## Rules
 
