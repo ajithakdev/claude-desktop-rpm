@@ -42,7 +42,7 @@ Read every changed line. For each file, write a few lines on what it does in the
 
 ### 4. Tests
 
-- A new command or behaviour adds a check to `tests/e2e.sh` and a line to `docs/TESTING.md`.
+- A new command or behavior adds a check to `tests/e2e.sh` and a line to `docs/TESTING.md`.
 - A new verification check adds a tampered case to `tests/mock-repo.sh`.
 - CI is green on the **final** head commit, not an earlier one.
 
