@@ -406,10 +406,12 @@ cmd_doctor() {
   probe "launcher (dark mode fix, staged updates)" "old launcher without the dark mode fix" "$0 update --force" our_launcher
   if [ -d "$STAGE_DIR/root" ]; then echo "  ok    update $(cat "$STAGE_DIR/version") waits for the next launch"; fi
   probe "auto-update on" "auto-update off" "$0 auto-update on" timer_on
+  if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
+    probe "GNOME search provider" "GNOME search provider missing" "$0 update --force" test -f "$SEARCH_INI"
+  fi
 
   echo "Desktop"
   if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
-    probe "GNOME search provider" "GNOME search provider missing" "$0 update --force" test -f "$SEARCH_INI"
     probe "tray icon (AppIndicator extension on)" "tray icon hidden: GNOME needs the AppIndicator extension" \
       "$(tray_fix)" tray_on_gnome
   fi
